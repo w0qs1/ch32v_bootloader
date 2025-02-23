@@ -30,9 +30,9 @@ Discarded input sections
                 0x0000000000000000       0x10 ./User/system_ch32v00x.o
  .data.SystemCoreClock
                 0x0000000000000000        0x4 ./User/system_ch32v00x.o
- .text          0x0000000000000000        0x0 ./Startup/custom_startup.o
- .data          0x0000000000000000        0x0 ./Startup/custom_startup.o
- .bss           0x0000000000000000        0x0 ./Startup/custom_startup.o
+ .text          0x0000000000000000        0x0 ./Startup/custom_boot.o
+ .data          0x0000000000000000        0x0 ./Startup/custom_boot.o
+ .bss           0x0000000000000000        0x0 ./Startup/custom_boot.o
  .text          0x0000000000000000        0x0 ./Startup/startup_ch32v00x.o
  .data          0x0000000000000000        0x0 ./Startup/startup_ch32v00x.o
  .bss           0x0000000000000000        0x0 ./Startup/startup_ch32v00x.o
@@ -997,7 +997,7 @@ LOAD ./User/application.o
 LOAD ./User/ch32v00x_it.o
 LOAD ./User/main.o
 LOAD ./User/system_ch32v00x.o
-LOAD ./Startup/custom_startup.o
+LOAD ./Startup/custom_boot.o
 LOAD ./Startup/startup_ch32v00x.o
 LOAD ./Peripheral/src/ch32v00x_adc.o
 LOAD ./Peripheral/src/ch32v00x_dbgmcu.o
@@ -1122,33 +1122,34 @@ END GROUP
  *(.gnu.linkonce.t.*)
                 0x0000000000000348                . = ALIGN (0x4)
 
-.custom_boot    0x0000000000000348       0x54
- .custom_boot   0x0000000000000348       0x54 ./Startup/custom_startup.o
+.custom_boot    0x0000000000000348       0x76
+ .custom_boot   0x0000000000000348       0x76 ./Startup/custom_boot.o
                 0x0000000000000348                custom_boot
 
-.rela.dyn       0x000000000000039c        0x0
- .rela.init     0x000000000000039c        0x0 ./User/ch32v00x_it.o
+.rela.dyn       0x00000000000003c0        0x0
+ .rela.init     0x00000000000003c0        0x0 ./User/ch32v00x_it.o
  .rela.text.handle_reset
-                0x000000000000039c        0x0 ./User/ch32v00x_it.o
+                0x00000000000003c0        0x0 ./User/ch32v00x_it.o
 
-.fini           0x000000000000039c        0x0
+.fini           0x00000000000003be        0x2
  *(SORT_NONE(.fini))
-                0x000000000000039c                . = ALIGN (0x4)
+                0x00000000000003c0                . = ALIGN (0x4)
+ *fill*         0x00000000000003be        0x2 
                 [!provide]                        PROVIDE (_etext = .)
                 [!provide]                        PROVIDE (_eitcm = .)
 
-.preinit_array  0x000000000000039c        0x0
+.preinit_array  0x00000000000003c0        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x000000000000039c        0x0
+.init_array     0x00000000000003c0        0x0
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x000000000000039c        0x0
+.fini_array     0x00000000000003c0        0x0
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
@@ -1168,15 +1169,15 @@ END GROUP
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
 
-.dalign         0x0000000020000000        0x0 load address 0x000000000000039c
+.dalign         0x0000000020000000        0x0 load address 0x00000000000003c0
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_data_vma = .)
 
-.dlalign        0x000000000000039c        0x0
-                0x000000000000039c                . = ALIGN (0x4)
-                0x000000000000039c                PROVIDE (_data_lma = .)
+.dlalign        0x00000000000003c0        0x0
+                0x00000000000003c0                . = ALIGN (0x4)
+                0x00000000000003c0                PROVIDE (_data_lma = .)
 
-.data           0x0000000020000000        0x0 load address 0x000000000000039c
+.data           0x0000000020000000        0x0 load address 0x00000000000003c0
                 0x0000000020000000                . = ALIGN (0x4)
  *(.gnu.linkonce.r.*)
  *(.data .data.*)
@@ -1195,7 +1196,7 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_edata = .)
 
-.bss            0x0000000020000000        0x0 load address 0x000000000000039c
+.bss            0x0000000020000000        0x0 load address 0x00000000000003c0
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_sbss = .)
  *(.sbss*)
@@ -1221,7 +1222,7 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_info    0x0000000000000000      0xbc0 ./User/ch32v00x_it.o
  .debug_info    0x0000000000000bc0      0x145 ./User/main.o
  .debug_info    0x0000000000000d05      0xc94 ./User/system_ch32v00x.o
- .debug_info    0x0000000000001999       0x26 ./Startup/custom_startup.o
+ .debug_info    0x0000000000001999       0x26 ./Startup/custom_boot.o
  .debug_info    0x00000000000019bf       0x22 ./Startup/startup_ch32v00x.o
  .debug_info    0x00000000000019e1     0x108c ./Peripheral/src/ch32v00x_rcc.o
 
@@ -1229,7 +1230,7 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_abbrev  0x0000000000000000      0x22c ./User/ch32v00x_it.o
  .debug_abbrev  0x000000000000022c       0xdf ./User/main.o
  .debug_abbrev  0x000000000000030b      0x2ee ./User/system_ch32v00x.o
- .debug_abbrev  0x00000000000005f9       0x14 ./Startup/custom_startup.o
+ .debug_abbrev  0x00000000000005f9       0x14 ./Startup/custom_boot.o
  .debug_abbrev  0x000000000000060d       0x12 ./Startup/startup_ch32v00x.o
  .debug_abbrev  0x000000000000061f      0x389 ./Peripheral/src/ch32v00x_rcc.o
 
@@ -1241,7 +1242,7 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_aranges
                 0x0000000000000050       0x28 ./User/system_ch32v00x.o
  .debug_aranges
-                0x0000000000000078       0x20 ./Startup/custom_startup.o
+                0x0000000000000078       0x20 ./Startup/custom_boot.o
  .debug_aranges
                 0x0000000000000098       0x30 ./Startup/startup_ch32v00x.o
  .debug_aranges
@@ -1254,26 +1255,26 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_ranges  0x00000000000000c8       0x28 ./Startup/startup_ch32v00x.o
  .debug_ranges  0x00000000000000f0       0xd0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_line     0x0000000000000000     0x1ea8
+.debug_line     0x0000000000000000     0x1ed1
  .debug_line    0x0000000000000000      0x346 ./User/ch32v00x_it.o
  .debug_line    0x0000000000000346      0x30e ./User/main.o
  .debug_line    0x0000000000000654      0x785 ./User/system_ch32v00x.o
- .debug_line    0x0000000000000dd9       0xce ./Startup/custom_startup.o
- .debug_line    0x0000000000000ea7      0x14e ./Startup/startup_ch32v00x.o
- .debug_line    0x0000000000000ff5      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_line    0x0000000000000dd9       0xf7 ./Startup/custom_boot.o
+ .debug_line    0x0000000000000ed0      0x14e ./Startup/startup_ch32v00x.o
+ .debug_line    0x000000000000101e      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_str      0x0000000000000000      0xb61
+.debug_str      0x0000000000000000      0xb5e
  .debug_str     0x0000000000000000      0x637 ./User/ch32v00x_it.o
                                         0x6a0 (size before relaxing)
  .debug_str     0x0000000000000637       0x44 ./User/main.o
                                         0x1e7 (size before relaxing)
  .debug_str     0x000000000000067b      0x172 ./User/system_ch32v00x.o
                                         0x763 (size before relaxing)
- .debug_str     0x00000000000007ed       0x28 ./Startup/custom_startup.o
-                                         0x6d (size before relaxing)
- .debug_str     0x0000000000000815       0x1e ./Startup/startup_ch32v00x.o
+ .debug_str     0x00000000000007ed       0x25 ./Startup/custom_boot.o
+                                         0x6a (size before relaxing)
+ .debug_str     0x0000000000000812       0x1e ./Startup/startup_ch32v00x.o
                                          0x6f (size before relaxing)
- .debug_str     0x0000000000000833      0x32e ./Peripheral/src/ch32v00x_rcc.o
+ .debug_str     0x0000000000000830      0x32e ./Peripheral/src/ch32v00x_rcc.o
                                         0x9cc (size before relaxing)
 
 .comment        0x0000000000000000       0x33

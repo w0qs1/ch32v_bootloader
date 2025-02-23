@@ -7,7 +7,7 @@ start address 0x00000000
 
 Program Header:
     LOAD off    0x00001000 vaddr 0x00000000 paddr 0x00000000 align 2**12
-         filesz 0x0000039c memsz 0x0000039c flags r-x
+         filesz 0x000003be memsz 0x000003c0 flags rwx
     LOAD off    0x00001700 vaddr 0x20000700 paddr 0x20000700 align 2**12
          filesz 0x00000000 memsz 0x00000100 flags rw-
 
@@ -15,43 +15,43 @@ Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
   0 .init         000000a0  00000000  00000000  00001000  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .highcodelalign 00000000  000000a0  000000a0  0000139c  2**0
+  1 .highcodelalign 00000000  000000a0  000000a0  000013be  2**0
                   CONTENTS
-  2 .highcode     00000000  20000000  20000000  0000139c  2**0
+  2 .highcode     00000000  20000000  20000000  000013be  2**0
                   CONTENTS
   3 .text         000002a8  000000a0  000000a0  000010a0  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  4 .custom_boot  00000054  00000348  00000348  00001348  2**0
+  4 .custom_boot  00000076  00000348  00000348  00001348  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  5 .fini         00000000  0000039c  0000039c  0000139c  2**0
-                  CONTENTS, ALLOC, LOAD, CODE
-  6 .dalign       00000000  20000000  20000000  0000139c  2**0
+  5 .fini         00000002  000003be  000003be  000013be  2**0
+                  ALLOC, CODE
+  6 .dalign       00000000  20000000  20000000  000013be  2**0
                   CONTENTS
-  7 .dlalign      00000000  0000039c  0000039c  0000139c  2**0
+  7 .dlalign      00000000  000003c0  000003c0  000013be  2**0
                   CONTENTS
-  8 .data         00000000  20000000  20000000  0000139c  2**0
+  8 .data         00000000  20000000  20000000  000013be  2**0
                   CONTENTS, ALLOC, LOAD, DATA
   9 .bss          00000000  20000000  20000000  00000000  2**0
                   ALLOC
  10 .stack        00000100  20000700  20000700  00001700  2**0
                   ALLOC
- 11 .debug_info   00002a6d  00000000  00000000  0000139c  2**0
+ 11 .debug_info   00002a6d  00000000  00000000  000013be  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_abbrev 000009a8  00000000  00000000  00003e09  2**0
+ 12 .debug_abbrev 000009a8  00000000  00000000  00003e2b  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_aranges 000001a8  00000000  00000000  000047b8  2**3
+ 13 .debug_aranges 000001a8  00000000  00000000  000047d8  2**3
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_ranges 000001c0  00000000  00000000  00004960  2**3
+ 14 .debug_ranges 000001c0  00000000  00000000  00004980  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   00001ea8  00000000  00000000  00004b20  2**0
+ 15 .debug_line   00001ed1  00000000  00000000  00004b40  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_str    00000b61  00000000  00000000  000069c8  2**0
+ 16 .debug_str    00000b5e  00000000  00000000  00006a11  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .comment      00000033  00000000  00000000  00007529  2**0
+ 17 .comment      00000033  00000000  00000000  0000756f  2**0
                   CONTENTS, READONLY
- 18 .debug_frame  000002a8  00000000  00000000  0000755c  2**2
+ 18 .debug_frame  000002a8  00000000  00000000  000075a4  2**2
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_loc    00000638  00000000  00000000  00007804  2**0
+ 19 .debug_loc    00000638  00000000  00000000  0000784c  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 00000000 l    d  .init	00000000 .init
@@ -59,9 +59,9 @@ SYMBOL TABLE:
 20000000 l    d  .highcode	00000000 .highcode
 000000a0 l    d  .text	00000000 .text
 00000348 l    d  .custom_boot	00000000 .custom_boot
-0000039c l    d  .fini	00000000 .fini
+000003be l    d  .fini	00000000 .fini
 20000000 l    d  .dalign	00000000 .dalign
-0000039c l    d  .dlalign	00000000 .dlalign
+000003c0 l    d  .dlalign	00000000 .dlalign
 20000000 l    d  .data	00000000 .data
 20000000 l    d  .bss	00000000 .bss
 20000700 l    d  .stack	00000000 .stack
@@ -124,7 +124,7 @@ SYMBOL TABLE:
 20000000 g       .data	00000000 _edata
 20000000 g       .bss	00000000 _end
 20000000 g       .highcode	00000000 _highcode_vma_end
-0000039c g       .dlalign	00000000 _data_lma
+000003c0 g       .dlalign	00000000 _data_lma
 00000280  w      .text	00000000 DMA1_Channel2_IRQHandler
 00000282  w      .text	00000000 handle_reset
 000000a0 g     F .text	0000000a .hidden __riscv_save_0
@@ -234,7 +234,7 @@ Disassembly of section .text:
   c6:	1161                	addi	sp,sp,-8
   c8:	6785                	lui	a5,0x1
   ca:	c002                	sw	zero,0(sp)
-  cc:	95f78793          	addi	a5,a5,-1697 # 95f <_data_lma+0x5c3>
+  cc:	95f78793          	addi	a5,a5,-1697 # 95f <_data_lma+0x59f>
   d0:	4702                	lw	a4,0(sp)
   d2:	00a76463          	bltu	a4,a0,da <delay_ms+0x14>
   d6:	0121                	addi	sp,sp,8
@@ -420,7 +420,7 @@ Disassembly of section .text:
  2b2:	0511                	addi	a0,a0,4
  2b4:	0591                	addi	a1,a1,4
  2b6:	fec5eae3          	bltu	a1,a2,2aa <handle_reset+0x28>
- 2ba:	39c00513          	li	a0,924
+ 2ba:	3c000513          	li	a0,960
  2be:	20000597          	auipc	a1,0x20000
  2c2:	d4258593          	addi	a1,a1,-702 # 20000000 <_highcode_vma_end>
  2c6:	20000617          	auipc	a2,0x20000
@@ -440,7 +440,7 @@ Disassembly of section .text:
  2fa:	0511                	addi	a0,a0,4
  2fc:	feb56de3          	bltu	a0,a1,2f6 <handle_reset+0x74>
  300:	000022b7          	lui	t0,0x2
- 304:	88028293          	addi	t0,t0,-1920 # 1880 <_data_lma+0x14e4>
+ 304:	88028293          	addi	t0,t0,-1920 # 1880 <_data_lma+0x14c0>
  308:	30029073          	csrw	mstatus,t0
  30c:	428d                	li	t0,3
  30e:	80429073          	csrw	0x804,t0
@@ -467,25 +467,34 @@ Disassembly of section .custom_boot:
 
 00000348 <custom_boot>:
  348:	400212b7          	lui	t0,0x40021
- 34c:	02e1                	addi	t0,t0,24
- 34e:	0002a303          	lw	t1,0(t0) # 40021000 <__global_pointer$+0x20020800>
- 352:	02036313          	ori	t1,t1,32
- 356:	0062a023          	sw	t1,0(t0)
- 35a:	400112b7          	lui	t0,0x40011
- 35e:	40028293          	addi	t0,t0,1024 # 40011400 <__global_pointer$+0x20010c00>
- 362:	0002a303          	lw	t1,0(t0)
- 366:	00336313          	ori	t1,t1,3
- 36a:	fff00393          	li	t2,-1
- 36e:	13d1                	addi	t2,t2,-12
- 370:	00737333          	and	t1,t1,t2
- 374:	0062a023          	sw	t1,0(t0)
- 378:	02c1                	addi	t0,t0,16
- 37a:	00030333          	add	t1,t1,zero
- 37e:	00136313          	ori	t1,t1,1
- 382:	0062a023          	sw	t1,0(t0)
- 386:	00100313          	li	t1,1
- 38a:	0342                	slli	t1,t1,0x10
- 38c:	00736333          	or	t1,t1,t2
- 390:	40600333          	neg	t1,t1
- 394:	0062a023          	sw	t1,0(t0)
- 398:	00008067          	ret
+ 34c:	01828293          	addi	t0,t0,24 # 40021018 <__global_pointer$+0x20020818>
+ 350:	0002a303          	lw	t1,0(t0)
+ 354:	00100393          	li	t2,1
+ 358:	03ba                	slli	t2,t2,0xe
+ 35a:	00736333          	or	t1,t1,t2
+ 35e:	0062a023          	sw	t1,0(t0)
+ 362:	400142b7          	lui	t0,0x40014
+ 366:	80828293          	addi	t0,t0,-2040 # 40013808 <__global_pointer$+0x20013008>
+ 36a:	400212b7          	lui	t0,0x40021
+ 36e:	02e1                	addi	t0,t0,24
+ 370:	0002a303          	lw	t1,0(t0) # 40021000 <__global_pointer$+0x20020800>
+ 374:	02036313          	ori	t1,t1,32
+ 378:	0062a023          	sw	t1,0(t0)
+ 37c:	400112b7          	lui	t0,0x40011
+ 380:	40028293          	addi	t0,t0,1024 # 40011400 <__global_pointer$+0x20010c00>
+ 384:	0002a303          	lw	t1,0(t0)
+ 388:	00336313          	ori	t1,t1,3
+ 38c:	fff00393          	li	t2,-1
+ 390:	13d1                	addi	t2,t2,-12
+ 392:	00737333          	and	t1,t1,t2
+ 396:	0062a023          	sw	t1,0(t0)
+ 39a:	02c1                	addi	t0,t0,16
+ 39c:	00030333          	add	t1,t1,zero
+ 3a0:	00136313          	ori	t1,t1,1
+ 3a4:	0062a023          	sw	t1,0(t0)
+ 3a8:	00100313          	li	t1,1
+ 3ac:	0342                	slli	t1,t1,0x10
+ 3ae:	00736333          	or	t1,t1,t2
+ 3b2:	40600333          	neg	t1,t1
+ 3b6:	0062a023          	sw	t1,0(t0)
+ 3ba:	00008067          	ret

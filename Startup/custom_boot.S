@@ -1,7 +1,43 @@
 .section .custom_boot, "ax"  // Executable code section
 .global custom_boot
 
+.data
+msg1: .word 
+
 custom_boot:
+    // Initialize UART
+    // Set Baud rate to 115200 8N1 config
+    // Transmit "POST Starting.."
+    // Print the status of Peripherals Tested
+    // Compute and Check CRC32 of Application
+    // Print "POST Success.." if fimrware is not corrupted
+    // Print "CRC failed" if firmware is corrupted
+
+    // Initialize UART
+    // [RCC_APB2_ENR] in t0
+    li t0, 0x40021018
+
+    // Enable clock for UART1
+    lw t1, 0(t0)
+    addi t2, zero, 1
+    slli t2, t2, 14
+    or t1, t1, t2
+    sw t1, 0(t0)
+
+    // Address of USART_BRR
+    li t0, 0x40013808
+
+    // Set M = 4, D = 5
+    addi t1, zero, 0x045
+    sw t1, 0(t0)
+
+    // Set Transmit Enable in USART_CTRL1
+    addi t0, t0, 4
+    addi t1, zero, 8
+    sw t1, 0(t0)
+
+
+
     // [RCC_APB2_ENR] in t0
     lui t0, 0x40021
     addi t0, t0, 0x018
