@@ -589,11 +589,11 @@
 		]
 	},
 	"flashConfig": {
-		"mcutype": "CH32V003",
+		"mcutype": "CH32V00x",
 		"address": "0x08000000",
 		"target_path": "obj/CH32V003F4P6_Bootloader.hex",
 		"clkSpeed": "High",
-		"debug_interface_mode": "",
+		"debug_interface_mode": "1-wire serial",
 		"erase": true,
 		"program": true,
 		"verify": true,
@@ -628,8 +628,8 @@
 				"set mem inaccessible-by-default off",
 				"set architecture riscv:rv32",
 				"set remotetimeout unlimited",
-				"set disassembler-options xw",
-				"set output-radix 16"
+				"set output-radix 16",
+				"set disassembler-options xw"
 			]
 		},
 		"startup": {

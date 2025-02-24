@@ -27,8 +27,8 @@
 					"set mem inaccessible-by-default off",
 					"set architecture riscv:rv32",
 					"set remotetimeout unlimited",
-					"set disassembler-options xw",
-					"set output-radix 16"
+					"set output-radix 16",
+					"set disassembler-options xw"
 				],
 				"options": []
 			},

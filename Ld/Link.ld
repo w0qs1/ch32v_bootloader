@@ -50,11 +50,12 @@ SECTIONS
 
     .fini :
     {
+      PROVIDE( _etext = . );  /* Modified to properly set the end of firmware */
       KEEP(*(SORT_NONE(.fini)))
       . = ALIGN(4);
     } >FLASH AT>FLASH
 
-    PROVIDE( _etext = . );
+    /*PROVIDE( _etext = . );*/
     PROVIDE( _eitcm = . );  
 
     .preinit_array :
