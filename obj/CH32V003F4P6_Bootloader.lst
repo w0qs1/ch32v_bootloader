@@ -7,7 +7,7 @@ start address 0x00000000
 
 Program Header:
     LOAD off    0x00001000 vaddr 0x00000000 paddr 0x00000000 align 2**12
-         filesz 0x000003be memsz 0x000003c0 flags rwx
+         filesz 0x000004b4 memsz 0x000004b4 flags r-x
     LOAD off    0x00001700 vaddr 0x20000700 paddr 0x20000700 align 2**12
          filesz 0x00000000 memsz 0x00000100 flags rw-
 
@@ -15,53 +15,53 @@ Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
   0 .init         000000a0  00000000  00000000  00001000  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .highcodelalign 00000000  000000a0  000000a0  000013be  2**0
+  1 .highcodelalign 00000000  000000a0  000000a0  000014b4  2**0
                   CONTENTS
-  2 .highcode     00000000  20000000  20000000  000013be  2**0
+  2 .highcode     00000000  20000000  20000000  000014b4  2**0
                   CONTENTS
-  3 .text         000002a8  000000a0  000000a0  000010a0  2**1
+  3 .text         000002cc  000000a0  000000a0  000010a0  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  4 .custom_boot  00000076  00000348  00000348  00001348  2**0
+  4 .custom_boot  00000148  0000036c  0000036c  0000136c  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  5 .fini         00000002  000003be  000003be  000013be  2**0
-                  ALLOC, CODE
-  6 .dalign       00000000  20000000  20000000  000013be  2**0
+  5 .fini         00000000  000004b4  000004b4  000014b4  2**0
+                  CONTENTS, ALLOC, LOAD, CODE
+  6 .dalign       00000000  20000000  20000000  000014b4  2**0
                   CONTENTS
-  7 .dlalign      00000000  000003c0  000003c0  000013be  2**0
+  7 .dlalign      00000000  000004b4  000004b4  000014b4  2**0
                   CONTENTS
-  8 .data         00000000  20000000  20000000  000013be  2**0
+  8 .data         00000000  20000000  20000000  000014b4  2**0
                   CONTENTS, ALLOC, LOAD, DATA
   9 .bss          00000000  20000000  20000000  00000000  2**0
                   ALLOC
  10 .stack        00000100  20000700  20000700  00001700  2**0
                   ALLOC
- 11 .debug_info   00002a6d  00000000  00000000  000013be  2**0
+ 11 .debug_info   00002a6d  00000000  00000000  000014b4  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_abbrev 000009a8  00000000  00000000  00003e2b  2**0
+ 12 .debug_abbrev 000009a8  00000000  00000000  00003f21  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_aranges 000001a8  00000000  00000000  000047d8  2**3
+ 13 .debug_aranges 000001a8  00000000  00000000  000048d0  2**3
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_ranges 000001c0  00000000  00000000  00004980  2**3
+ 14 .debug_ranges 000001c0  00000000  00000000  00004a78  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   00001ed1  00000000  00000000  00004b40  2**0
+ 15 .debug_line   00002051  00000000  00000000  00004c38  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_str    00000b5e  00000000  00000000  00006a11  2**0
+ 16 .debug_str    00000b5e  00000000  00000000  00006c89  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .comment      00000033  00000000  00000000  0000756f  2**0
+ 17 .comment      00000033  00000000  00000000  000077e7  2**0
                   CONTENTS, READONLY
- 18 .debug_frame  000002a8  00000000  00000000  000075a4  2**2
+ 18 .debug_frame  000002a8  00000000  00000000  0000781c  2**2
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_loc    00000638  00000000  00000000  0000784c  2**0
+ 19 .debug_loc    00000638  00000000  00000000  00007ac4  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 00000000 l    d  .init	00000000 .init
 000000a0 l    d  .highcodelalign	00000000 .highcodelalign
 20000000 l    d  .highcode	00000000 .highcode
 000000a0 l    d  .text	00000000 .text
-00000348 l    d  .custom_boot	00000000 .custom_boot
-000003be l    d  .fini	00000000 .fini
+0000036c l    d  .custom_boot	00000000 .custom_boot
+000004b4 l    d  .fini	00000000 .fini
 20000000 l    d  .dalign	00000000 .dalign
-000003c0 l    d  .dlalign	00000000 .dlalign
+000004b4 l    d  .dlalign	00000000 .dlalign
 20000000 l    d  .data	00000000 .data
 20000000 l    d  .bss	00000000 .bss
 20000700 l    d  .stack	00000000 .stack
@@ -78,6 +78,13 @@ SYMBOL TABLE:
 00000000 l    df *ABS*	00000000 main.c
 00000000 l    df *ABS*	00000000 system_ch32v00x.c
 00000000 l    df *ABS*	00000000 ch32v00x_rcc.c
+00000000 l    df *ABS*	00000000 ./Startup/custom_boot.o
+0000043a l       .custom_boot	00000000 uart_init
+00000348 l       .text	00000000 msg1
+000003be l       .custom_boot	00000000 print_uart
+00000408 l       .custom_boot	00000000 done
+00000410 l       .custom_boot	00000000 uart_putc
+00000359 l       .text	00000000 msg2
 20000800 g       .data	00000000 __global_pointer$
 00000280  w      .text	00000000 TIM1_CC_IRQHandler
 000000b6 g     F .text	00000010 HardFault_Handler
@@ -124,14 +131,14 @@ SYMBOL TABLE:
 20000000 g       .data	00000000 _edata
 20000000 g       .bss	00000000 _end
 20000000 g       .highcode	00000000 _highcode_vma_end
-000003c0 g       .dlalign	00000000 _data_lma
+000004b4 g       .dlalign	00000000 _data_lma
 00000280  w      .text	00000000 DMA1_Channel2_IRQHandler
 00000282  w      .text	00000000 handle_reset
 000000a0 g     F .text	0000000a .hidden __riscv_save_0
 00000280  w      .text	00000000 FLASH_IRQHandler
 00000280  w      .text	00000000 USART1_IRQHandler
 00000280  w      .text	00000000 I2C1_ER_IRQHandler
-00000348 g       .custom_boot	00000000 custom_boot
+0000036c g       .custom_boot	00000000 custom_boot
 000000aa g     F .text	0000000a .hidden __riscv_restore_1
 
 
@@ -234,7 +241,7 @@ Disassembly of section .text:
   c6:	1161                	addi	sp,sp,-8
   c8:	6785                	lui	a5,0x1
   ca:	c002                	sw	zero,0(sp)
-  cc:	95f78793          	addi	a5,a5,-1697 # 95f <_data_lma+0x59f>
+  cc:	95f78793          	addi	a5,a5,-1697 # 95f <_data_lma+0x4ab>
   d0:	4702                	lw	a4,0(sp)
   d2:	00a76463          	bltu	a4,a0,da <delay_ms+0x14>
   d6:	0121                	addi	sp,sp,8
@@ -405,7 +412,7 @@ Disassembly of section .text:
  280:	a001                	j	280 <ADC1_IRQHandler>
 
 00000282 <handle_reset>:
- 282:	0c6000ef          	jal	ra,348 <custom_boot>
+ 282:	0ea000ef          	jal	ra,36c <custom_boot>
  286:	20000197          	auipc	gp,0x20000
  28a:	57a18193          	addi	gp,gp,1402 # 20000800 <__global_pointer$>
  28e:	00018113          	mv	sp,gp
@@ -420,7 +427,7 @@ Disassembly of section .text:
  2b2:	0511                	addi	a0,a0,4
  2b4:	0591                	addi	a1,a1,4
  2b6:	fec5eae3          	bltu	a1,a2,2aa <handle_reset+0x28>
- 2ba:	3c000513          	li	a0,960
+ 2ba:	4b400513          	li	a0,1204
  2be:	20000597          	auipc	a1,0x20000
  2c2:	d4258593          	addi	a1,a1,-702 # 20000000 <_highcode_vma_end>
  2c6:	20000617          	auipc	a2,0x20000
@@ -440,7 +447,7 @@ Disassembly of section .text:
  2fa:	0511                	addi	a0,a0,4
  2fc:	feb56de3          	bltu	a0,a1,2f6 <handle_reset+0x74>
  300:	000022b7          	lui	t0,0x2
- 304:	88028293          	addi	t0,t0,-1920 # 1880 <_data_lma+0x14c0>
+ 304:	88028293          	addi	t0,t0,-1920 # 1880 <_data_lma+0x13cc>
  308:	30029073          	csrw	mstatus,t0
  30c:	428d                	li	t0,3
  30e:	80429073          	csrw	0x804,t0
@@ -463,38 +470,131 @@ Disassembly of section .text:
  344:	c308                	sw	a0,0(a4)
  346:	8082                	ret
 
+00000348 <msg1>:
+ 348:	4f50                	lw	a2,28(a4)
+ 34a:	53205453          	0x53205453
+ 34e:	6174                	flw	fa3,68(a0)
+ 350:	7472                	flw	fs0,60(sp)
+ 352:	6e69                	lui	t3,0x1a
+ 354:	0a2e2e67          	0xa2e2e67
+	...
+
+00000359 <msg2>:
+ 359:	4f50                	lw	a2,28(a4)
+ 35b:	53205453          	0x53205453
+ 35f:	6375                	lui	t1,0x1d
+ 361:	73736563          	bltu	t1,s7,a8b <_data_lma+0x5d7>
+ 365:	2e2e                	lhu	a1,26(a2)
+ 367:	000a                	c.slli	zero,0x2
+ 369:	0000                	unimp
+	...
+
 Disassembly of section .custom_boot:
 
-00000348 <custom_boot>:
- 348:	400212b7          	lui	t0,0x40021
- 34c:	01828293          	addi	t0,t0,24 # 40021018 <__global_pointer$+0x20020818>
- 350:	0002a303          	lw	t1,0(t0)
- 354:	00100393          	li	t2,1
- 358:	03ba                	slli	t2,t2,0xe
- 35a:	00736333          	or	t1,t1,t2
- 35e:	0062a023          	sw	t1,0(t0)
- 362:	400142b7          	lui	t0,0x40014
- 366:	80828293          	addi	t0,t0,-2040 # 40013808 <__global_pointer$+0x20013008>
- 36a:	400212b7          	lui	t0,0x40021
- 36e:	02e1                	addi	t0,t0,24
- 370:	0002a303          	lw	t1,0(t0) # 40021000 <__global_pointer$+0x20020800>
- 374:	02036313          	ori	t1,t1,32
- 378:	0062a023          	sw	t1,0(t0)
- 37c:	400112b7          	lui	t0,0x40011
- 380:	40028293          	addi	t0,t0,1024 # 40011400 <__global_pointer$+0x20010c00>
- 384:	0002a303          	lw	t1,0(t0)
- 388:	00336313          	ori	t1,t1,3
- 38c:	fff00393          	li	t2,-1
- 390:	13d1                	addi	t2,t2,-12
- 392:	00737333          	and	t1,t1,t2
- 396:	0062a023          	sw	t1,0(t0)
- 39a:	02c1                	addi	t0,t0,16
- 39c:	00030333          	add	t1,t1,zero
- 3a0:	00136313          	ori	t1,t1,1
- 3a4:	0062a023          	sw	t1,0(t0)
- 3a8:	00100313          	li	t1,1
- 3ac:	0342                	slli	t1,t1,0x10
- 3ae:	00736333          	or	t1,t1,t2
- 3b2:	40600333          	neg	t1,t1
- 3b6:	0062a023          	sw	t1,0(t0)
+0000036c <custom_boot>:
+ 36c:	20000137          	lui	sp,0x20000
+ 370:	30010113          	addi	sp,sp,768 # 20000300 <_highcode_vma_end+0x300>
+ 374:	1171                	addi	sp,sp,-4
+ 376:	c006                	sw	ra,0(sp)
+ 378:	0c2000ef          	jal	ra,43a <uart_init>
+ 37c:	34800513          	li	a0,840
+ 380:	03e000ef          	jal	ra,3be <print_uart>
+ 384:	400112b7          	lui	t0,0x40011
+ 388:	40028293          	addi	t0,t0,1024 # 40011400 <__global_pointer$+0x20010c00>
+ 38c:	0002a303          	lw	t1,0(t0)
+ 390:	00336313          	ori	t1,t1,3
+ 394:	fff00393          	li	t2,-1
+ 398:	13d1                	addi	t2,t2,-12
+ 39a:	00737333          	and	t1,t1,t2
+ 39e:	0062a023          	sw	t1,0(t0)
+ 3a2:	02c1                	addi	t0,t0,16
+ 3a4:	00100313          	li	t1,1
+ 3a8:	0342                	slli	t1,t1,0x10
+ 3aa:	00736333          	or	t1,t1,t2
+ 3ae:	40600333          	neg	t1,t1
+ 3b2:	0062a023          	sw	t1,0(t0)
+ 3b6:	4082                	lw	ra,0(sp)
+ 3b8:	0111                	addi	sp,sp,4
  3ba:	00008067          	ret
+
+000003be <print_uart>:
+ 3be:	1171                	addi	sp,sp,-4
+ 3c0:	c006                	sw	ra,0(sp)
+ 3c2:	82aa                	mv	t0,a0
+ 3c4:	0002a303          	lw	t1,0(t0)
+ 3c8:	0ff37393          	andi	t2,t1,255
+ 3cc:	02038e63          	beqz	t2,408 <done>
+ 3d0:	040000ef          	jal	ra,410 <uart_putc>
+ 3d4:	00835313          	srli	t1,t1,0x8
+ 3d8:	0ff37393          	andi	t2,t1,255
+ 3dc:	02038663          	beqz	t2,408 <done>
+ 3e0:	030000ef          	jal	ra,410 <uart_putc>
+ 3e4:	00835313          	srli	t1,t1,0x8
+ 3e8:	0ff37393          	andi	t2,t1,255
+ 3ec:	00038e63          	beqz	t2,408 <done>
+ 3f0:	020000ef          	jal	ra,410 <uart_putc>
+ 3f4:	00835313          	srli	t1,t1,0x8
+ 3f8:	0ff37393          	andi	t2,t1,255
+ 3fc:	00038663          	beqz	t2,408 <done>
+ 400:	010000ef          	jal	ra,410 <uart_putc>
+ 404:	0291                	addi	t0,t0,4
+ 406:	bf7d                	j	3c4 <print_uart+0x6>
+
+00000408 <done>:
+ 408:	4082                	lw	ra,0(sp)
+ 40a:	0111                	addi	sp,sp,4
+ 40c:	00008067          	ret
+
+00000410 <uart_putc>:
+ 410:	1171                	addi	sp,sp,-4
+ 412:	c006                	sw	ra,0(sp)
+ 414:	40014437          	lui	s0,0x40014
+ 418:	80040413          	addi	s0,s0,-2048 # 40013800 <__global_pointer$+0x20013000>
+ 41c:	00040483          	lb	s1,0(s0)
+ 420:	0404f493          	andi	s1,s1,64
+ 424:	dce5                	beqz	s1,41c <uart_putc+0xc>
+ 426:	00740223          	sb	t2,4(s0)
+ 42a:	0c000613          	li	a2,192
+ 42e:	167d                	addi	a2,a2,-1
+ 430:	fe7d                	bnez	a2,42e <uart_putc+0x1e>
+ 432:	4082                	lw	ra,0(sp)
+ 434:	0111                	addi	sp,sp,4
+ 436:	00008067          	ret
+
+0000043a <uart_init>:
+ 43a:	1171                	addi	sp,sp,-4
+ 43c:	c006                	sw	ra,0(sp)
+ 43e:	400212b7          	lui	t0,0x40021
+ 442:	01828293          	addi	t0,t0,24 # 40021018 <__global_pointer$+0x20020818>
+ 446:	0002a303          	lw	t1,0(t0)
+ 44a:	00100393          	li	t2,1
+ 44e:	03ba                	slli	t2,t2,0xe
+ 450:	00736333          	or	t1,t1,t2
+ 454:	0062a023          	sw	t1,0(t0)
+ 458:	400142b7          	lui	t0,0x40014
+ 45c:	80828293          	addi	t0,t0,-2040 # 40013808 <__global_pointer$+0x20013008>
+ 460:	04500313          	li	t1,69
+ 464:	0062a023          	sw	t1,0(t0)
+ 468:	0291                	addi	t0,t0,4
+ 46a:	00100313          	li	t1,1
+ 46e:	0336                	slli	t1,t1,0xd
+ 470:	0321                	addi	t1,t1,8
+ 472:	0062a023          	sw	t1,0(t0)
+ 476:	400212b7          	lui	t0,0x40021
+ 47a:	02e1                	addi	t0,t0,24
+ 47c:	0002a303          	lw	t1,0(t0) # 40021000 <__global_pointer$+0x20020800>
+ 480:	02036313          	ori	t1,t1,32
+ 484:	0062a023          	sw	t1,0(t0)
+ 488:	400112b7          	lui	t0,0x40011
+ 48c:	40028293          	addi	t0,t0,1024 # 40011400 <__global_pointer$+0x20010c00>
+ 490:	0002a303          	lw	t1,0(t0)
+ 494:	00f003b7          	lui	t2,0xf00
+ 498:	fff3c393          	not	t2,t2
+ 49c:	00737333          	and	t1,t1,t2
+ 4a0:	43ad                	li	t2,11
+ 4a2:	03d2                	slli	t2,t2,0x14
+ 4a4:	00736333          	or	t1,t1,t2
+ 4a8:	0062a023          	sw	t1,0(t0)
+ 4ac:	4082                	lw	ra,0(sp)
+ 4ae:	0111                	addi	sp,sp,4
+ 4b0:	00008067          	ret
