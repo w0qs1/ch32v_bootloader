@@ -7,7 +7,7 @@ start address 0x00000000
 
 Program Header:
     LOAD off    0x00001000 vaddr 0x00000000 paddr 0x00000000 align 2**12
-         filesz 0x000004c4 memsz 0x000004c4 flags r-x
+         filesz 0x000004cc memsz 0x000004d0 flags rwx
     LOAD off    0x00001700 vaddr 0x20000700 paddr 0x20000700 align 2**12
          filesz 0x00000000 memsz 0x00000100 flags rw-
 
@@ -15,43 +15,45 @@ Sections:
 Idx Name          Size      VMA       LMA       File off  Algn
   0 .init         000000a0  00000000  00000000  00001000  2**2
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  1 .highcodelalign 00000000  000000a0  000000a0  000014c4  2**0
+  1 .highcodelalign 00000000  000000a0  000000a0  000014cc  2**0
                   CONTENTS
-  2 .highcode     00000000  20000000  20000000  000014c4  2**0
+  2 .highcode     00000000  20000000  20000000  000014cc  2**0
                   CONTENTS
   3 .text         000002cc  000000a0  000000a0  000010a0  2**1
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  4 .custom_boot  00000158  0000036c  0000036c  0000136c  2**0
+  4 .custom_boot  00000160  0000036c  0000036c  0000136c  2**0
                   CONTENTS, ALLOC, LOAD, READONLY, CODE
-  5 .fini         00000000  000004c4  000004c4  000014c4  2**0
+  5 .fini         00000000  000004cc  000004cc  000014cc  2**0
                   CONTENTS, ALLOC, LOAD, CODE
-  6 .dalign       00000000  20000000  20000000  000014c4  2**0
+  6 .dalign       00000000  20000000  20000000  000014cc  2**0
                   CONTENTS
-  7 .dlalign      00000000  000004c4  000004c4  000014c4  2**0
+  7 .dlalign      00000000  000004cc  000004cc  000014cc  2**0
                   CONTENTS
-  8 .data         00000000  20000000  20000000  000014c4  2**0
+  8 .data         00000000  20000000  20000000  000014cc  2**0
                   CONTENTS, ALLOC, LOAD, DATA
   9 .bss          00000000  20000000  20000000  00000000  2**0
                   ALLOC
- 10 .stack        00000100  20000700  20000700  00001700  2**0
+ 10 .crc          00000004  000004cc  000004cc  000014cc  2**0
                   ALLOC
- 11 .debug_info   00002a6d  00000000  00000000  000014c4  2**0
+ 11 .stack        00000100  20000700  20000700  00001700  2**0
+                  ALLOC
+ 12 .debug_info   00002a6d  00000000  00000000  000014cc  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_abbrev 000009a8  00000000  00000000  00003f31  2**0
+ 13 .debug_abbrev 000009a8  00000000  00000000  00003f39  2**0
                   CONTENTS, READONLY, DEBUGGING
- 13 .debug_aranges 000001a8  00000000  00000000  000048e0  2**3
+ 14 .debug_aranges 000001a8  00000000  00000000  000048e8  2**3
                   CONTENTS, READONLY, DEBUGGING
- 14 .debug_ranges 000001c0  00000000  00000000  00004a88  2**3
+ 15 .debug_ranges 000001c0  00000000  00000000  00004a90  2**3
                   CONTENTS, READONLY, DEBUGGING
- 15 .debug_line   00002075  00000000  00000000  00004c48  2**0
+ 16 .debug_line   00002081  00000000  00000000  00004c50  2**0
                   CONTENTS, READONLY, DEBUGGING
- 16 .debug_str    00000b5e  00000000  00000000  00006cbd  2**0
+ 17 .debug_str    00000b5e  00000000  00000000  00006cd1  2**0
                   CONTENTS, READONLY, DEBUGGING
- 17 .comment      00000033  00000000  00000000  0000781b  2**0
+ 18 .comment      00000033  00000000  00000000  0000782f  2**0
                   CONTENTS, READONLY
- 18 .debug_frame  000002a8  00000000  00000000  00007850  2**2
+ 19 .debug_frame  000002a8  00000000  00000000  00007864  2**2
                   CONTENTS, READONLY, DEBUGGING
- 19 .debug_loc    00000638  00000000  00000000  00007af8  2**0
+ 20 .debug_loc    00000638  00000000  00000000  00007b0c  2**0
                   CONTENTS, READONLY, DEBUGGING
 SYMBOL TABLE:
 00000000 l    d  .init	00000000 .init
@@ -59,11 +61,12 @@ SYMBOL TABLE:
 20000000 l    d  .highcode	00000000 .highcode
 000000a0 l    d  .text	00000000 .text
 0000036c l    d  .custom_boot	00000000 .custom_boot
-000004c4 l    d  .fini	00000000 .fini
+000004cc l    d  .fini	00000000 .fini
 20000000 l    d  .dalign	00000000 .dalign
-000004c4 l    d  .dlalign	00000000 .dlalign
+000004cc l    d  .dlalign	00000000 .dlalign
 20000000 l    d  .data	00000000 .data
 20000000 l    d  .bss	00000000 .bss
+000004cc l    d  .crc	00000000 .crc
 20000700 l    d  .stack	00000000 .stack
 00000000 l    d  .debug_info	00000000 .debug_info
 00000000 l    d  .debug_abbrev	00000000 .debug_abbrev
@@ -81,8 +84,6 @@ SYMBOL TABLE:
 00000000 l    df *ABS*	00000000 ./Startup/custom_boot.o
 00000001 l       *ABS*	00000000 FW_CHECK
 00000000 l       *ABS*	00000000 FW_BASE
-00000000 l       *ABS*	00000000 FW_END
-00000000 l       *ABS*	00000000 CRC_LOC
 00000004 l       *ABS*	00000000 UART_B_M
 00000005 l       *ABS*	00000000 UART_B_F
 000004b8 l       .custom_boot	00000000 fw_check
@@ -98,10 +99,12 @@ SYMBOL TABLE:
 00000280  w      .text	00000000 SysTick_Handler
 00000280  w      .text	00000000 PVD_IRQHandler
 000000b4 g     F .text	00000002 NMI_Handler
+000004cc g       .custom_boot	00000000 _etext
 20000000 g       .bss	00000000 _sbss
 00000100 g       *ABS*	00000000 __stack_size
 000000aa g     F .text	0000000a .hidden __riscv_restore_2
 000000a0 g       .init	00000000 _einit
+000004cc g       .crc	00000000 _flash_crc
 00000280  w      .text	00000000 SPI1_IRQHandler
 000000a0 g     F .text	0000000a .hidden __riscv_save_1
 000000aa g     F .text	0000000a .hidden __riscv_restore_0
@@ -138,7 +141,7 @@ SYMBOL TABLE:
 20000000 g       .data	00000000 _edata
 20000000 g       .bss	00000000 _end
 20000000 g       .highcode	00000000 _highcode_vma_end
-000004c4 g       .dlalign	00000000 _data_lma
+000004cc g       .dlalign	00000000 _data_lma
 00000280  w      .text	00000000 DMA1_Channel2_IRQHandler
 00000282  w      .text	00000000 handle_reset
 000000a0 g     F .text	0000000a .hidden __riscv_save_0
@@ -248,7 +251,7 @@ Disassembly of section .text:
   c6:	1161                	addi	sp,sp,-8
   c8:	6785                	lui	a5,0x1
   ca:	c002                	sw	zero,0(sp)
-  cc:	95f78793          	addi	a5,a5,-1697 # 95f <_data_lma+0x49b>
+  cc:	95f78793          	addi	a5,a5,-1697 # 95f <_etext+0x493>
   d0:	4702                	lw	a4,0(sp)
   d2:	00a76463          	bltu	a4,a0,da <delay_ms+0x14>
   d6:	0121                	addi	sp,sp,8
@@ -434,7 +437,7 @@ Disassembly of section .text:
  2b2:	0511                	addi	a0,a0,4
  2b4:	0591                	addi	a1,a1,4
  2b6:	fec5eae3          	bltu	a1,a2,2aa <handle_reset+0x28>
- 2ba:	4c400513          	li	a0,1220
+ 2ba:	4cc00513          	li	a0,1228
  2be:	20000597          	auipc	a1,0x20000
  2c2:	d4258593          	addi	a1,a1,-702 # 20000000 <_highcode_vma_end>
  2c6:	20000617          	auipc	a2,0x20000
@@ -454,12 +457,12 @@ Disassembly of section .text:
  2fa:	0511                	addi	a0,a0,4
  2fc:	feb56de3          	bltu	a0,a1,2f6 <handle_reset+0x74>
  300:	000022b7          	lui	t0,0x2
- 304:	88028293          	addi	t0,t0,-1920 # 1880 <_data_lma+0x13bc>
+ 304:	88028293          	addi	t0,t0,-1920 # 1880 <_etext+0x13b4>
  308:	30029073          	csrw	mstatus,t0
  30c:	428d                	li	t0,3
  30e:	80429073          	csrw	0x804,t0
  312:	00000297          	auipc	t0,0x0
- 316:	cee28293          	addi	t0,t0,-786 # 0 <CRC_LOC>
+ 316:	cee28293          	addi	t0,t0,-786 # 0 <FW_BASE>
  31a:	0032e293          	ori	t0,t0,3
  31e:	30529073          	csrw	mtvec,t0
  322:	e2dff0ef          	jal	ra,14e <SystemInit>
@@ -490,7 +493,7 @@ Disassembly of section .text:
  359:	4f50                	lw	a2,28(a4)
  35b:	53205453          	0x53205453
  35f:	6375                	lui	t1,0x1d
- 361:	73736563          	bltu	t1,s7,a8b <_data_lma+0x5c7>
+ 361:	73736563          	bltu	t1,s7,a8b <_etext+0x5bf>
  365:	2e2e                	lhu	a1,26(a2)
  367:	000a                	c.slli	zero,0x2
  369:	0000                	unimp
@@ -610,6 +613,8 @@ Disassembly of section .custom_boot:
 000004b8 <fw_check>:
  4b8:	1171                	addi	sp,sp,-4
  4ba:	c006                	sw	ra,0(sp)
- 4bc:	4082                	lw	ra,0(sp)
- 4be:	0111                	addi	sp,sp,4
- 4c0:	00008067          	ret
+ 4bc:	4cc00293          	li	t0,1228
+ 4c0:	4cc00293          	li	t0,1228
+ 4c4:	4082                	lw	ra,0(sp)
+ 4c6:	0111                	addi	sp,sp,4
+ 4c8:	00008067          	ret

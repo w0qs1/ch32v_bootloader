@@ -17,14 +17,18 @@ custom_boot:
     addi sp, sp, -4
     sw ra, 0(sp)    // Save return address
 
+    .if FW_CHECK
+    jal ra, fw_check
+    .endif
+
     jal ra, uart_init
 
     la a0, msg1     // Print "POST Starting.."
     jal ra, print_uart
 
-    .if FW_CHECK
-    jal ra, fw_check
-    .endif
+    // .if FW_CHECK
+    // jal ra, fw_check
+    // .endif
 
     // [GPIOD_CFGLR] in t0
     lui t0, 0x40011
@@ -135,7 +139,7 @@ uart_init:
     li t0, 0x40013808
 
     // Set M = 4, D = 5
-    addi t1, zero, 0x045
+    addi t1, zero, ((UART_B_M << 4) | UART_B_F)
     sw t1, 0(t0)
 
     // Set Transmit Enable, USART Enable in USART_CTRL1
@@ -176,6 +180,9 @@ uart_init:
 fw_check:
     addi sp, sp, -4
     sw ra, 0(sp)
+
+    la t0, _flash_crc
+    la t0, _etext
 
     lw ra, 0(sp)
     addi sp, sp, 4

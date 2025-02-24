@@ -160,6 +160,14 @@ SECTIONS
     PROVIDE( _end = _ebss);
 	PROVIDE( end = . );
 
+  /* Reserve space for CRC at end of FLASH */ /*User added*/
+    .crc :
+    {
+      KEEP(*(.crc))
+      PROVIDE(_flash_crc = .);
+      . = . + 4;  /* Reserve 4 bytes for a 32-bit CRC */
+    } >FLASH AT>FLASH
+
 	.stack ORIGIN(RAM) + LENGTH(RAM) - __stack_size :
 	{
 	    PROVIDE( _heap_end = . );
@@ -168,7 +176,6 @@ SECTIONS
 	    . = . + __stack_size;
 	    PROVIDE( _eusrstack = .);
 	} >RAM 
-	
 }
 
 
