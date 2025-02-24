@@ -17,18 +17,19 @@ custom_boot:
     addi sp, sp, -4
     sw ra, 0(sp)    // Save return address
 
-    .if FW_CHECK
-    jal ra, fw_check
-    .endif
-
     jal ra, uart_init
 
     la a0, msg1     // Print "POST Starting.."
     jal ra, print_uart
 
-    // .if FW_CHECK
-    // jal ra, fw_check
-    // .endif
+    .if FW_CHECK
+    la a0, msg2     // Firmware Check Enabled
+    jal ra, print_uart
+    jal ra, fw_check
+    .else
+    la a0, msg3     // No firmware Check Enabled
+    jal ra, print_uart
+    .endif
 
     // [GPIOD_CFGLR] in t0
     lui t0, 0x40011
@@ -189,6 +190,9 @@ fw_check:
     jalr x0, 0(ra)
 
 .section .rodata, "a", @progbits
+.align 4
 msg1: .asciz "POST Starting..\n"
-// msg1: .asciz "Post Starting..\n"
-msg2: .asciz "POST Success..\n"
+.align 4
+msg2: .asciz "Running Firmware Check..\n"
+.align 4
+msg3: .asciz "No Firmware Check enabled..\n"

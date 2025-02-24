@@ -160,7 +160,7 @@ SECTIONS
     PROVIDE( _end = _ebss);
 	PROVIDE( end = . );
 
-  /* Reserve space for CRC at end of FLASH */ /*User added*/
+  /* Reserve space for CRC at end of FLASH - User added*/
     .crc :
     {
       KEEP(*(.crc))
