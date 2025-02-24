@@ -5,8 +5,8 @@ custom_boot:
     // Initialize UART
     // Set Baud rate to 115200 8N1 config
     // Transmit "POST Starting.."
-    // Print the status of Peripherals Tested
     // Compute and Check CRC32 of Application
+    // Print the status of Peripherals Tested
     // Print "POST Success.." if fimrware is not corrupted
     // Print "CRC failed" if firmware is corrupted
 
