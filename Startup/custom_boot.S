@@ -25,6 +25,8 @@ custom_boot:
     .if FW_CHECK
     la a0, msg2     // Firmware Check Enabled
     jal ra, print_uart
+    la a0, FW_BASE
+    la a1, FW_END
     jal ra, fw_check
     .else
     la a0, msg3     // No firmware Check Enabled
@@ -182,12 +184,31 @@ fw_check:
     addi sp, sp, -4
     sw ra, 0(sp)
 
-    la t0, _flash_crc
-    la t0, _etext
-
+    lui a3, 0xedb88
+    li a4, 0
+    li a5, -1
+    addi a3, a3, 800
+1:
+    bne a4, a1, 2f
+    not a0, a5
     lw ra, 0(sp)
     addi sp, sp, 4
     jalr x0, 0(ra)
+2:
+    add a2, a0, a4
+    lbu a2, 0(a2)
+    xor a5, a5, a2
+    li a2, 8
+3:
+    srli t1, a5, 0x1
+    andi a5, a5, 1
+    neg a5, a5
+    and a5, a5, a3
+    addi a2, a2, -1
+    xor a5, t1, a5
+    bnez a2, 3b
+    addi a4, a4, 1
+    j 1b
 
 .section .rodata, "a", @progbits
 .align 4
