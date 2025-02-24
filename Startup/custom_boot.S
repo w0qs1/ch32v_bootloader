@@ -1,6 +1,8 @@
 .section .custom_boot, "ax"  // Executable code section
 .global custom_boot
 
+#include "boot_config.S"
+
 custom_boot:
     // Initialize UART
     // Set Baud rate to 115200 8N1 config
@@ -15,10 +17,18 @@ custom_boot:
     addi sp, sp, -4
     sw ra, 0(sp)    // Save return address
 
+    .ifdef FW_CHECK
+    jal ra, fw_check
+    .endif
+
     jal ra, uart_init
 
-    la a0, msg1
+    la a0, msg1     // Print "POST Starting.."
     jal ra, print_uart
+
+    // .if FW_CHECK
+    // jal ra, fw_check
+    // .endif
 
     // [GPIOD_CFGLR] in t0
     lui t0, 0x40011
@@ -162,6 +172,14 @@ uart_init:
     slli t2, t2, 20           // Move into position
     or t1, t1, t2             // Set bits 20-23 to desired value
     sw t1, 0(t0)
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    jalr x0, 0(ra)
+
+fw_check:
+    addi sp, sp, -4
+    sw ra, 0(sp)
 
     lw ra, 0(sp)
     addi sp, sp, 4

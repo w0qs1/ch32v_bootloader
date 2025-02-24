@@ -5,14 +5,17 @@
 
 # Add inputs and outputs from these tool invocations to the build variables 
 S_UPPER_SRCS += \
+../Startup/config.S \
 ../Startup/custom_boot.S \
 ../Startup/startup_ch32v00x.S 
 
 S_UPPER_DEPS += \
+./Startup/config.d \
 ./Startup/custom_boot.d \
 ./Startup/startup_ch32v00x.d 
 
 OBJS += \
+./Startup/config.o \
 ./Startup/custom_boot.o \
 ./Startup/startup_ch32v00x.o 
 
