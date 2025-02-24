@@ -80,6 +80,11 @@ SYMBOL TABLE:
 00000000 l    df *ABS*	00000000 ch32v00x_rcc.c
 00000000 l    df *ABS*	00000000 ./Startup/custom_boot.o
 00000001 l       *ABS*	00000000 FW_CHECK
+00000000 l       *ABS*	00000000 FW_BASE
+00000000 l       *ABS*	00000000 FW_END
+00000000 l       *ABS*	00000000 CRC_LOC
+00000004 l       *ABS*	00000000 UART_B_M
+00000005 l       *ABS*	00000000 UART_B_F
 000004b8 l       .custom_boot	00000000 fw_check
 0000043e l       .custom_boot	00000000 uart_init
 00000348 l       .text	00000000 msg1
@@ -454,7 +459,7 @@ Disassembly of section .text:
  30c:	428d                	li	t0,3
  30e:	80429073          	csrw	0x804,t0
  312:	00000297          	auipc	t0,0x0
- 316:	cee28293          	addi	t0,t0,-786 # 0 <_sinit>
+ 316:	cee28293          	addi	t0,t0,-786 # 0 <CRC_LOC>
  31a:	0032e293          	ori	t0,t0,3
  31e:	30529073          	csrw	mtvec,t0
  322:	e2dff0ef          	jal	ra,14e <SystemInit>

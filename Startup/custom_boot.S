@@ -17,18 +17,14 @@ custom_boot:
     addi sp, sp, -4
     sw ra, 0(sp)    // Save return address
 
-    .ifdef FW_CHECK
-    jal ra, fw_check
-    .endif
-
     jal ra, uart_init
 
     la a0, msg1     // Print "POST Starting.."
     jal ra, print_uart
 
-    // .if FW_CHECK
-    // jal ra, fw_check
-    // .endif
+    .if FW_CHECK
+    jal ra, fw_check
+    .endif
 
     // [GPIOD_CFGLR] in t0
     lui t0, 0x40011

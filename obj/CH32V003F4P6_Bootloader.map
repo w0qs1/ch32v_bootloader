@@ -24,9 +24,9 @@ Discarded input sections
                 0x0000000000000000       0x10 ./User/system_ch32v00x.o
  .data.SystemCoreClock
                 0x0000000000000000        0x4 ./User/system_ch32v00x.o
- .text          0x0000000000000000        0x0 ./Startup/config.o
- .data          0x0000000000000000        0x0 ./Startup/config.o
- .bss           0x0000000000000000        0x0 ./Startup/config.o
+ .text          0x0000000000000000        0x0 ./Startup/boot_config.o
+ .data          0x0000000000000000        0x0 ./Startup/boot_config.o
+ .bss           0x0000000000000000        0x0 ./Startup/boot_config.o
  .text          0x0000000000000000        0x0 ./Startup/custom_boot.o
  .data          0x0000000000000000        0x0 ./Startup/custom_boot.o
  .bss           0x0000000000000000        0x0 ./Startup/custom_boot.o
@@ -993,7 +993,7 @@ Linker script and memory map
 LOAD ./User/ch32v00x_it.o
 LOAD ./User/main.o
 LOAD ./User/system_ch32v00x.o
-LOAD ./Startup/config.o
+LOAD ./Startup/boot_config.o
 LOAD ./Startup/custom_boot.o
 LOAD ./Startup/startup_ch32v00x.o
 LOAD ./Peripheral/src/ch32v00x_adc.o
