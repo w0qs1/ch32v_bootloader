@@ -27,12 +27,28 @@ custom_boot:
     jal ra, print_uart
     la a0, FW_BASE
     la a1, FW_END
-    jal ra, fw_check
+    // Compute CRC32
+    jal ra, compute_crc
+
+    la a1, CRC_LOC
+    lw t0, CRC_LOC
+    beq a0, t0, fw_correct
     .else
     la a0, msg3     // No firmware Check Enabled
     jal ra, print_uart
+    jal x0, fw_correct
     .endif
 
+fw_wrong:
+    la a0, msg4
+    jal ra, print_uart
+
+inf_loop:
+    jal x0, inf_loop
+
+fw_correct:
+    la a0, msg5
+    jal ra, print_uart
     // Jump to the standard startup code
     lw ra, 0(sp)
     addi sp, sp, 4
@@ -153,7 +169,7 @@ uart_init:
     addi sp, sp, 4
     jalr x0, 0(ra)
 
-fw_check:
+compute_crc:
     addi sp, sp, -4
     sw ra, 0(sp)
 
@@ -190,3 +206,7 @@ msg1: .asciz "POST Starting..\n"
 msg2: .asciz "Running Firmware Check..\n"
 .align 4
 msg3: .asciz "No Firmware Check enabled..\n"
+.align 4
+msg4: .asciz "Firmware corrupted!\n"
+.align 4
+msg5: .asciz "Firmware OK..\n"
