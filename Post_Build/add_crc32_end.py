@@ -1,6 +1,7 @@
 import sys
 import intelhex
 import crcmod.predefined
+import time
 
 # def hex_to_bin(input_hex, output_bin):
 #     """Convert Intel HEX to binary."""
@@ -31,13 +32,13 @@ def bin_to_hex(input_bin, output_hex):
     ih.loadbin(input_bin, offset=0)
     ih.tofile(output_hex, format='hex')
 
-def main(input_bin, output_hex):
-
+def main(input_bin, output_hex, print_chk):
     # Compute Ethernet CRC32
     crc_int, crc_bytes = compute_crc32(input_bin)
 
     # Print the CRC in hexadecimal
-    print(f"CRC32 added to FW: 0x{crc_int:08X}")
+    if print_chk:
+        print(f"CRC32 added to FW: 0x{crc_int:08X}")
 
     # Append CRC32 to binary
     append_crc32_to_bin(input_bin, crc_bytes)
@@ -55,4 +56,6 @@ if __name__ == "__main__":
     input_bin_file = sys.argv[1]
     output_hex_file = sys.argv[2]
 
-    main(input_bin_file, output_hex_file)
+    # Running it twice computes the correct CRC (sync issue)
+    main(input_bin_file, output_hex_file, 0)
+    main(input_bin_file, output_hex_file, 1)
