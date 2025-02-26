@@ -13,7 +13,7 @@ def compute_crc32(binary_file):
         data = f.read()
 
     # Create a CRC function using the Ethernet polynomial.
-    # The 'crc-32' predefined in crcmod uses polynomial 0x104C11DB7, which in reversed form is 0x04C11DB7.
+    # The 'crc-32' predefined in crcmod uses polynomial 0x04C11DB7.
     crc32_func = crcmod.predefined.Crc('crc-32')
     crc32_func.update(data)
     crc_int = crc32_func.crcValue & 0xFFFFFFFF

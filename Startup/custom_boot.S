@@ -39,16 +39,20 @@ custom_boot:
     jal x0, fw_correct
     .endif
 
+.if FW_CHECK
 fw_wrong:
     la a0, msg4
     jal ra, print_uart
 
 inf_loop:
     jal x0, inf_loop
+.endif
 
 fw_correct:
+    .if FW_CHECK
     la a0, msg5
     jal ra, print_uart
+    .endif
     // Jump to the standard startup code
     lw ra, 0(sp)
     addi sp, sp, 4
@@ -130,8 +134,9 @@ uart_init:
     // Address of USART_BRR
     li t0, 0x40013808
 
-    // Set M = 4, D = 5
-    addi t1, zero, ((UART_B_M << 4) | UART_B_F)
+    // Set M and F
+    li t1, ((UART_B_M << 4) | UART_B_F)
+    // addi t1, zero, ((UART_B_M << 4) | UART_B_F)
     sw t1, 0(t0)
 
     // Set Transmit Enable, USART Enable in USART_CTRL1
@@ -169,6 +174,7 @@ uart_init:
     addi sp, sp, 4
     jalr x0, 0(ra)
 
+.if FW_CHECK
 compute_crc:
     addi sp, sp, -4
     sw ra, 0(sp)
@@ -198,15 +204,21 @@ compute_crc:
     bnez a2, 3b
     addi a4, a4, 1
     j 1b
+.endif
 
 .section .rodata, "a", @progbits
 .align 4
 msg1: .asciz "POST Starting..\n"
+.if FW_CHECK
 .align 4
 msg2: .asciz "Running Firmware Check..\n"
+.endif
 .align 4
 msg3: .asciz "No Firmware Check enabled..\n"
+
+.if FW_CHECK
 .align 4
 msg4: .asciz "Firmware corrupted!\n"
 .align 4
 msg5: .asciz "Firmware OK..\n"
+.endif
