@@ -1,11 +1,26 @@
 import sys
 import intelhex
 import crcmod.predefined
+import random
 
 # def hex_to_bin(input_hex, output_bin):
 #     """Convert Intel HEX to binary."""
 #     ih = intelhex.IntelHex(input_hex)
 #     ih.tofile(output_bin, format='bin')
+
+def corrupt(input_bin):
+    """Corrupt a random number of bytes (1-5) in the binary file."""
+    with open(input_bin, 'r+b') as f:
+        data = bytearray(f.read())
+        num_bytes = random.randint(1, 2)  # Choose how many bytes to corrupt
+        file_size = min(len(data), 0x3E0) # Corrupt only the application
+        
+        for _ in range(num_bytes):
+            index = random.randint(0, file_size - 1)  # Choose a random index
+            data[index] = random.randint(0, 255)  # Change to a random byte value
+        
+        f.seek(0)
+        f.write(data)
 
 def compute_crc32(binary_file):
     """Compute Ethernet CRC32 of the binary file using polynomial 0x04C11DB7."""
@@ -42,6 +57,12 @@ def main(input_bin, output_hex):
     # Append CRC32 to binary
     append_crc32_to_bin(input_bin, crc_bytes)
 
+    # Change some random bytes to random values
+    corrupt(input_bin)
+
+    # Print
+    print("Corrupted the firmware")
+
     # Convert binary back to HEX
     bin_to_hex(input_bin, output_hex)
 
@@ -49,7 +70,7 @@ def main(input_bin, output_hex):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python add_crc32_end.py <input.bin> <output.hex>")
+        print("Usage: python corrupt_firmware.py <input.bin> <output.hex>")
         sys.exit(1)
 
     input_bin_file = sys.argv[1]

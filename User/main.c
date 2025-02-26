@@ -58,7 +58,7 @@
 
 void delay_ms(int n) {
     for(volatile uint32_t i = 0; i < n; i++) {
-        for(volatile uint32_t j = 0; j < 2400; j++);    // ~1ms
+        for(volatile uint32_t j = 0; j < 3000; j++);    // ~1ms
     }
 }
 

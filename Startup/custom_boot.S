@@ -30,9 +30,8 @@ custom_boot:
     // Compute CRC32
     jal ra, compute_crc
 
-    la a1, CRC_LOC
     lw t0, CRC_LOC
-    beq a0, t0, fw_correct
+    beq a0, t0, fw_correct1
     .else
     la a0, msg3     // No firmware Check Enabled
     jal ra, print_uart
@@ -47,6 +46,11 @@ fw_wrong:
 inf_loop:
     jal x0, inf_loop
 .endif
+
+// Redundant check to ensure that the beq instruction itself is not corrupted
+fw_correct1:
+    lw t0, CRC_LOC
+    beq a0, t0, fw_correct
 
 fw_correct:
     .if FW_CHECK

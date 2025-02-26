@@ -1122,35 +1122,35 @@ END GROUP
                 0x00000000000003e0                . = ALIGN (0x4)
  *fill*         0x00000000000003df        0x1 
 
-.custom_boot    0x00000000000003e0      0x18c
- .custom_boot   0x00000000000003e0      0x18c ./Startup/custom_boot.o
+.custom_boot    0x00000000000003e0      0x190
+ .custom_boot   0x00000000000003e0      0x190 ./Startup/custom_boot.o
                 0x00000000000003e0                custom_boot
 
-.rela.dyn       0x000000000000056c        0x0
+.rela.dyn       0x0000000000000570        0x0
  .rela.custom_boot
-                0x000000000000056c        0x0 ./User/ch32v00x_it.o
- .rela.init     0x000000000000056c        0x0 ./User/ch32v00x_it.o
+                0x0000000000000570        0x0 ./User/ch32v00x_it.o
+ .rela.init     0x0000000000000570        0x0 ./User/ch32v00x_it.o
  .rela.text.handle_reset
-                0x000000000000056c        0x0 ./User/ch32v00x_it.o
+                0x0000000000000570        0x0 ./User/ch32v00x_it.o
 
-.fini           0x000000000000056c        0x0
-                0x000000000000056c                PROVIDE (_etext = .)
+.fini           0x0000000000000570        0x0
+                0x0000000000000570                PROVIDE (_etext = .)
  *(SORT_NONE(.fini))
-                0x000000000000056c                . = ALIGN (0x4)
+                0x0000000000000570                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (_eitcm = .)
 
-.preinit_array  0x000000000000056c        0x0
+.preinit_array  0x0000000000000570        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x000000000000056c        0x0
+.init_array     0x0000000000000570        0x0
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x000000000000056c        0x0
+.fini_array     0x0000000000000570        0x0
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
@@ -1170,15 +1170,15 @@ END GROUP
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
 
-.dalign         0x0000000020000000        0x0 load address 0x000000000000056c
+.dalign         0x0000000020000000        0x0 load address 0x0000000000000570
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_data_vma = .)
 
-.dlalign        0x000000000000056c        0x0
-                0x000000000000056c                . = ALIGN (0x4)
-                0x000000000000056c                PROVIDE (_data_lma = .)
+.dlalign        0x0000000000000570        0x0
+                0x0000000000000570                . = ALIGN (0x4)
+                0x0000000000000570                PROVIDE (_data_lma = .)
 
-.data           0x0000000020000000        0x0 load address 0x000000000000056c
+.data           0x0000000020000000        0x0 load address 0x0000000000000570
                 0x0000000020000000                . = ALIGN (0x4)
  *(.gnu.linkonce.r.*)
  *(.data .data.*)
@@ -1197,7 +1197,7 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_edata = .)
 
-.bss            0x0000000020000000        0x0 load address 0x000000000000056c
+.bss            0x0000000020000000        0x0 load address 0x0000000000000570
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_sbss = .)
  *(.sbss*)
@@ -1256,13 +1256,13 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_ranges  0x00000000000000c8       0x28 ./Startup/startup_ch32v00x.o
  .debug_ranges  0x00000000000000f0       0xd0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_line     0x0000000000000000     0x20db
+.debug_line     0x0000000000000000     0x20e1
  .debug_line    0x0000000000000000      0x346 ./User/ch32v00x_it.o
  .debug_line    0x0000000000000346      0x30e ./User/main.o
  .debug_line    0x0000000000000654      0x785 ./User/system_ch32v00x.o
- .debug_line    0x0000000000000dd9      0x301 ./Startup/custom_boot.o
- .debug_line    0x00000000000010da      0x14e ./Startup/startup_ch32v00x.o
- .debug_line    0x0000000000001228      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_line    0x0000000000000dd9      0x307 ./Startup/custom_boot.o
+ .debug_line    0x00000000000010e0      0x14e ./Startup/startup_ch32v00x.o
+ .debug_line    0x000000000000122e      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
 
 .debug_str      0x0000000000000000      0xb5e
  .debug_str     0x0000000000000000      0x637 ./User/ch32v00x_it.o
