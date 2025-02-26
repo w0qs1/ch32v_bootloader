@@ -37,7 +37,7 @@
 				"stop_on_first_build_error": true,
 				"pre_script": "",
 				"pre_script_description": "",
-				"post_script": "",
+				"post_script": "python ../Post_Build/add_crc32_end.py CH32V003F4P6_Bootloader.bin CH32V003F4P6_Bootloader_CRC.hex",
 				"post_script_description": "",
 				"excludeResources": [],
 				"riscvTargetProcessor": {

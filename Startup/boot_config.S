@@ -10,6 +10,7 @@
 // Use the below table to set the baud rate UART during boot
 // The UART uses the 8N1 configuration
 // The boot runs at 24MHz using the HSI Clock
+// The HCLK prescalar is set to 3, hence UART runs at 8MHz
 // -----------------+----------+---------
 // UART Baud Rate   | Mantissa | Fraction
 // -----------------+----------+---------

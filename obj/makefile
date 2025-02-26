@@ -51,8 +51,12 @@ CH32V003F4P6_Bootloader.siz \
 # All Target
 all: 
 	$(MAKE) --no-print-directory main-build 
+	$(MAKE) --no-print-directory post-build 
 
 main-build: CH32V003F4P6_Bootloader.elf secondary-outputs
+
+post-build: 
+	python ../Post_Build/add_crc32_end.py CH32V003F4P6_Bootloader.bin CH32V003F4P6_Bootloader_CRC.hex
 
 # Tool invocations
 CH32V003F4P6_Bootloader.elf: $(OBJS) $(USER_OBJS)
