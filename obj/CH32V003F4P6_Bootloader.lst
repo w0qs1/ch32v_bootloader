@@ -74,12 +74,6 @@ SYMBOL TABLE:
 00000000 l    d  .comment	00000000 .comment
 00000000 l    d  .debug_frame	00000000 .debug_frame
 00000000 l    d  .debug_loc	00000000 .debug_loc
-00000000 l    df *ABS*	00000000 ./Startup/startup_ch32v00x.o
-00000001 l       *ABS*	00000000 FW_CHECK
-00000000 l       *ABS*	00000000 FW_BASE
-00000004 l       *ABS*	00000000 UART_B_M
-00000005 l       *ABS*	00000000 UART_B_F
-00000000 l       *ABS*	00000000 PERI_INIT
 00000000 l    df *ABS*	00000000 ch32v00x_it.c
 00000000 l    df *ABS*	00000000 main.c
 00000000 l    df *ABS*	00000000 system_ch32v00x.c

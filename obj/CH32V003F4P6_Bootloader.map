@@ -28,8 +28,8 @@ Discarded input sections
  .data          0x0000000000000000        0x0 ./User/test.o
  .bss           0x0000000000000000        0x0 ./User/test.o
  .text.test     0x0000000000000000        0x6 ./User/test.o
- .debug_info    0x0000000000000000       0xbb ./User/test.o
- .debug_abbrev  0x0000000000000000       0x85 ./User/test.o
+ .debug_info    0x0000000000000000       0xbf ./User/test.o
+ .debug_abbrev  0x0000000000000000       0x87 ./User/test.o
  .debug_aranges
                 0x0000000000000000       0x20 ./User/test.o
  .debug_ranges  0x0000000000000000       0x10 ./User/test.o
