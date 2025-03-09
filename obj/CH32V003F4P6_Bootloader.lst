@@ -74,6 +74,12 @@ SYMBOL TABLE:
 00000000 l    d  .comment	00000000 .comment
 00000000 l    d  .debug_frame	00000000 .debug_frame
 00000000 l    d  .debug_loc	00000000 .debug_loc
+00000000 l    df *ABS*	00000000 ./Startup/startup_ch32v00x.o
+00000001 l       *ABS*	00000000 FW_CHECK
+00000000 l       *ABS*	00000000 FW_BASE
+00000004 l       *ABS*	00000000 UART_B_M
+00000005 l       *ABS*	00000000 UART_B_F
+00000000 l       *ABS*	00000000 PERI_INIT
 00000000 l    df *ABS*	00000000 ch32v00x_it.c
 00000000 l    df *ABS*	00000000 main.c
 00000000 l    df *ABS*	00000000 system_ch32v00x.c
@@ -83,6 +89,7 @@ SYMBOL TABLE:
 00000000 l       *ABS*	00000000 FW_BASE
 00000004 l       *ABS*	00000000 UART_B_M
 00000005 l       *ABS*	00000000 UART_B_F
+00000000 l       *ABS*	00000000 PERI_INIT
 000004b4 l       .custom_boot	00000000 uart_init
 00000350 l       .text	00000000 msg1
 00000438 l       .custom_boot	00000000 print_uart
@@ -288,14 +295,14 @@ Disassembly of section .text:
  11e:	40e7a023          	sw	a4,1024(a5)
  122:	40011437          	lui	s0,0x40011
  126:	41042783          	lw	a5,1040(s0) # 40011410 <__global_pointer$+0x20010c10>
- 12a:	1f400513          	li	a0,500
- 12e:	0047e793          	ori	a5,a5,4
- 132:	40f42823          	sw	a5,1040(s0)
- 136:	3f41                	jal	c6 <delay_ms>
- 138:	41042783          	lw	a5,1040(s0)
- 13c:	00040737          	lui	a4,0x40
- 140:	1f400513          	li	a0,500
- 144:	8fd9                	or	a5,a5,a4
+ 12a:	00040737          	lui	a4,0x40
+ 12e:	1f400513          	li	a0,500
+ 132:	8fd9                	or	a5,a5,a4
+ 134:	40f42823          	sw	a5,1040(s0)
+ 138:	3779                	jal	c6 <delay_ms>
+ 13a:	41042783          	lw	a5,1040(s0)
+ 13e:	1f400513          	li	a0,500
+ 142:	0047e793          	ori	a5,a5,4
  146:	40f42823          	sw	a5,1040(s0)
  14a:	3fb5                	jal	c6 <delay_ms>
  14c:	bfd9                	j	122 <__stack_size+0x22>

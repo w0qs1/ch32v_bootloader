@@ -9,6 +9,7 @@
 ;* Attention: This software (modified or not) and binary are used for 
 ;* microcontroller manufactured by Nanjing Qinheng Microelectronics.
 ;*******************************************************************************/
+#include "boot_config.S"
 
 	.section  .init, "ax", @progbits
 	.globl  _start
@@ -174,6 +175,12 @@ handle_reset:
     csrw mtvec, t0
   
     jal   SystemInit
+
+    // Initialize Peripherals if defined
+    .if PERI_INIT
+    jal ra, test
+    .endif
+
     la t0, main
     csrw mepc, t0
     mret

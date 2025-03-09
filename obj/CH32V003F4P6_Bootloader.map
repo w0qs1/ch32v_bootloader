@@ -24,6 +24,19 @@ Discarded input sections
                 0x0000000000000000       0x10 ./User/system_ch32v00x.o
  .data.SystemCoreClock
                 0x0000000000000000        0x4 ./User/system_ch32v00x.o
+ .text          0x0000000000000000        0x0 ./User/test.o
+ .data          0x0000000000000000        0x0 ./User/test.o
+ .bss           0x0000000000000000        0x0 ./User/test.o
+ .text.test     0x0000000000000000        0x6 ./User/test.o
+ .debug_info    0x0000000000000000       0xbb ./User/test.o
+ .debug_abbrev  0x0000000000000000       0x85 ./User/test.o
+ .debug_aranges
+                0x0000000000000000       0x20 ./User/test.o
+ .debug_ranges  0x0000000000000000       0x10 ./User/test.o
+ .debug_line    0x0000000000000000      0x195 ./User/test.o
+ .debug_str     0x0000000000000000      0x1b7 ./User/test.o
+ .comment       0x0000000000000000       0x34 ./User/test.o
+ .debug_frame   0x0000000000000000       0x20 ./User/test.o
  .text          0x0000000000000000        0x0 ./Startup/boot_config.o
  .data          0x0000000000000000        0x0 ./Startup/boot_config.o
  .bss           0x0000000000000000        0x0 ./Startup/boot_config.o
@@ -993,6 +1006,7 @@ Linker script and memory map
 LOAD ./User/ch32v00x_it.o
 LOAD ./User/main.o
 LOAD ./User/system_ch32v00x.o
+LOAD ./User/test.o
 LOAD ./Startup/boot_config.o
 LOAD ./Startup/custom_boot.o
 LOAD ./Startup/startup_ch32v00x.o

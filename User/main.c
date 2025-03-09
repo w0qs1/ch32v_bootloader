@@ -74,9 +74,9 @@ int main(void) {
     volatile uint32_t *gpiod_bsrr = (uint32_t *) GPIOD_BSRR;
     
     while(1) {
-        *gpiod_bsrr |= (1 << 2);
-        delay_ms(500);
         *gpiod_bsrr |= (1 << 18);
+        delay_ms(500);
+        *gpiod_bsrr |= (1 << 2);
         delay_ms(500);
     }
 }
