@@ -24,19 +24,6 @@ Discarded input sections
                 0x0000000000000000       0x10 ./User/system_ch32v00x.o
  .data.SystemCoreClock
                 0x0000000000000000        0x4 ./User/system_ch32v00x.o
- .text          0x0000000000000000        0x0 ./User/test.o
- .data          0x0000000000000000        0x0 ./User/test.o
- .bss           0x0000000000000000        0x0 ./User/test.o
- .text.test     0x0000000000000000        0x6 ./User/test.o
- .debug_info    0x0000000000000000       0xbf ./User/test.o
- .debug_abbrev  0x0000000000000000       0x87 ./User/test.o
- .debug_aranges
-                0x0000000000000000       0x20 ./User/test.o
- .debug_ranges  0x0000000000000000       0x10 ./User/test.o
- .debug_line    0x0000000000000000      0x195 ./User/test.o
- .debug_str     0x0000000000000000      0x1b7 ./User/test.o
- .comment       0x0000000000000000       0x34 ./User/test.o
- .debug_frame   0x0000000000000000       0x20 ./User/test.o
  .text          0x0000000000000000        0x0 ./Startup/boot_config.o
  .data          0x0000000000000000        0x0 ./Startup/boot_config.o
  .bss           0x0000000000000000        0x0 ./Startup/boot_config.o
@@ -997,7 +984,8 @@ Discarded input sections
 Memory Configuration
 
 Name             Origin             Length             Attributes
-FLASH            0x0000000000000000 0x0000000000004000 xr
+FLASH_BOOT       0x0000000000000000 0x0000000000000400 xr
+FLASH_APPL       0x0000000000000400 0x0000000000003c00 xr
 RAM              0x0000000020000000 0x0000000000000800 xrw
 *default*        0x0000000000000000 0xffffffffffffffff
 
@@ -1006,7 +994,6 @@ Linker script and memory map
 LOAD ./User/ch32v00x_it.o
 LOAD ./User/main.o
 LOAD ./User/system_ch32v00x.o
-LOAD ./User/test.o
 LOAD ./Startup/boot_config.o
 LOAD ./Startup/custom_boot.o
 LOAD ./Startup/startup_ch32v00x.o
@@ -1057,11 +1044,11 @@ END GROUP
                 0x00000000000000a0                _einit = .
 
 .highcodelalign
-                0x00000000000000a0        0x0
-                0x00000000000000a0                . = ALIGN (0x4)
-                0x00000000000000a0                PROVIDE (_highcode_lma = .)
+                0x0000000000000400        0x0
+                0x0000000000000400                . = ALIGN (0x4)
+                0x0000000000000400                PROVIDE (_highcode_lma = .)
 
-.highcode       0x0000000020000000        0x0 load address 0x00000000000000a0
+.highcode       0x0000000020000000        0x0 load address 0x0000000000000400
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_highcode_vma_start = .)
  *(.highcode)
@@ -1069,102 +1056,106 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_highcode_vma_end = .)
 
-.text           0x00000000000000a0      0x340
+.bootloader     0x00000000000000a0      0x21f
                 0x00000000000000a0                . = ALIGN (0x4)
+ *(.text.bootloader)
+ .text.bootloader
+                0x00000000000000a0      0x190 ./Startup/custom_boot.o
+                0x00000000000000a0                custom_boot
+ *(.rodata.bootloader)
+ *fill*         0x0000000000000230        0x0 
+ .rodata.bootloader
+                0x0000000000000230       0x8f ./Startup/custom_boot.o
+
+.text           0x0000000000000400      0x2a8
+                0x0000000000000400                . = ALIGN (0x4)
  *(.text)
- .text          0x00000000000000a0       0x14 c:/mounriver/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/rv32ecxw/ilp32e\libgcc.a(save-restore.o)
-                0x00000000000000a0                __riscv_save_1
-                0x00000000000000a0                __riscv_save_2
-                0x00000000000000a0                __riscv_save_0
-                0x00000000000000aa                __riscv_restore_0
-                0x00000000000000aa                __riscv_restore_1
-                0x00000000000000aa                __riscv_restore_2
+ .text          0x0000000000000400       0x14 c:/mounriver/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/rv32ecxw/ilp32e\libgcc.a(save-restore.o)
+                0x0000000000000400                __riscv_save_1
+                0x0000000000000400                __riscv_save_2
+                0x0000000000000400                __riscv_save_0
+                0x000000000000040a                __riscv_restore_0
+                0x000000000000040a                __riscv_restore_1
+                0x000000000000040a                __riscv_restore_2
  *(.text.*)
  .text.NMI_Handler
-                0x00000000000000b4        0x2 ./User/ch32v00x_it.o
-                0x00000000000000b4                NMI_Handler
+                0x0000000000000414        0x2 ./User/ch32v00x_it.o
+                0x0000000000000414                NMI_Handler
  .text.HardFault_Handler
-                0x00000000000000b6       0x10 ./User/ch32v00x_it.o
-                0x00000000000000b6                HardFault_Handler
+                0x0000000000000416       0x10 ./User/ch32v00x_it.o
+                0x0000000000000416                HardFault_Handler
  .text.delay_ms
-                0x00000000000000c6       0x2c ./User/main.o
-                0x00000000000000c6                delay_ms
+                0x0000000000000426       0x2c ./User/main.o
+                0x0000000000000426                delay_ms
  .text.startup.main
-                0x00000000000000f2       0x5c ./User/main.o
-                0x00000000000000f2                main
+                0x0000000000000452       0x5c ./User/main.o
+                0x0000000000000452                main
  .text.SystemInit
-                0x000000000000014e      0x132 ./User/system_ch32v00x.o
-                0x000000000000014e                SystemInit
+                0x00000000000004ae      0x132 ./User/system_ch32v00x.o
+                0x00000000000004ae                SystemInit
  .text.vector_handler
-                0x0000000000000280        0x2 ./Startup/startup_ch32v00x.o
-                0x0000000000000280                TIM1_CC_IRQHandler
-                0x0000000000000280                SysTick_Handler
-                0x0000000000000280                PVD_IRQHandler
-                0x0000000000000280                SPI1_IRQHandler
-                0x0000000000000280                AWU_IRQHandler
-                0x0000000000000280                EXTI7_0_IRQHandler
-                0x0000000000000280                DMA1_Channel4_IRQHandler
-                0x0000000000000280                ADC1_IRQHandler
-                0x0000000000000280                DMA1_Channel7_IRQHandler
-                0x0000000000000280                I2C1_EV_IRQHandler
-                0x0000000000000280                DMA1_Channel6_IRQHandler
-                0x0000000000000280                RCC_IRQHandler
-                0x0000000000000280                TIM1_TRG_COM_IRQHandler
-                0x0000000000000280                DMA1_Channel1_IRQHandler
-                0x0000000000000280                DMA1_Channel5_IRQHandler
-                0x0000000000000280                DMA1_Channel3_IRQHandler
-                0x0000000000000280                TIM1_UP_IRQHandler
-                0x0000000000000280                WWDG_IRQHandler
-                0x0000000000000280                TIM2_IRQHandler
-                0x0000000000000280                SW_Handler
-                0x0000000000000280                TIM1_BRK_IRQHandler
-                0x0000000000000280                DMA1_Channel2_IRQHandler
-                0x0000000000000280                FLASH_IRQHandler
-                0x0000000000000280                USART1_IRQHandler
-                0x0000000000000280                I2C1_ER_IRQHandler
+                0x00000000000005e0        0x2 ./Startup/startup_ch32v00x.o
+                0x00000000000005e0                TIM1_CC_IRQHandler
+                0x00000000000005e0                SysTick_Handler
+                0x00000000000005e0                PVD_IRQHandler
+                0x00000000000005e0                SPI1_IRQHandler
+                0x00000000000005e0                AWU_IRQHandler
+                0x00000000000005e0                EXTI7_0_IRQHandler
+                0x00000000000005e0                DMA1_Channel4_IRQHandler
+                0x00000000000005e0                ADC1_IRQHandler
+                0x00000000000005e0                DMA1_Channel7_IRQHandler
+                0x00000000000005e0                I2C1_EV_IRQHandler
+                0x00000000000005e0                DMA1_Channel6_IRQHandler
+                0x00000000000005e0                RCC_IRQHandler
+                0x00000000000005e0                TIM1_TRG_COM_IRQHandler
+                0x00000000000005e0                DMA1_Channel1_IRQHandler
+                0x00000000000005e0                DMA1_Channel5_IRQHandler
+                0x00000000000005e0                DMA1_Channel3_IRQHandler
+                0x00000000000005e0                TIM1_UP_IRQHandler
+                0x00000000000005e0                WWDG_IRQHandler
+                0x00000000000005e0                TIM2_IRQHandler
+                0x00000000000005e0                SW_Handler
+                0x00000000000005e0                TIM1_BRK_IRQHandler
+                0x00000000000005e0                DMA1_Channel2_IRQHandler
+                0x00000000000005e0                FLASH_IRQHandler
+                0x00000000000005e0                USART1_IRQHandler
+                0x00000000000005e0                I2C1_ER_IRQHandler
  .text.handle_reset
-                0x0000000000000282       0xb4 ./Startup/startup_ch32v00x.o
-                0x0000000000000282                handle_reset
+                0x00000000000005e2       0xb4 ./Startup/startup_ch32v00x.o
+                0x00000000000005e2                handle_reset
  .text.RCC_AdjustHSICalibrationValue
-                0x0000000000000336       0x12 ./Peripheral/src/ch32v00x_rcc.o
-                0x0000000000000336                RCC_AdjustHSICalibrationValue
+                0x0000000000000696       0x12 ./Peripheral/src/ch32v00x_rcc.o
+                0x0000000000000696                RCC_AdjustHSICalibrationValue
  *(.rodata)
- *fill*         0x0000000000000348        0x8 
- .rodata        0x0000000000000350       0x8f ./Startup/custom_boot.o
  *(.rodata*)
  *(.gnu.linkonce.t.*)
-                0x00000000000003e0                . = ALIGN (0x4)
- *fill*         0x00000000000003df        0x1 
+                0x00000000000006a8                . = ALIGN (0x4)
 
-.custom_boot    0x00000000000003e0      0x190
- .custom_boot   0x00000000000003e0      0x190 ./Startup/custom_boot.o
-                0x00000000000003e0                custom_boot
-
-.rela.dyn       0x0000000000000570        0x0
- .rela.custom_boot
-                0x0000000000000570        0x0 ./User/ch32v00x_it.o
- .rela.init     0x0000000000000570        0x0 ./User/ch32v00x_it.o
+.rela.dyn       0x00000000000006a8        0x0
+ .rela.text.bootloader
+                0x00000000000006a8        0x0 ./User/ch32v00x_it.o
+ .rela.init     0x00000000000006a8        0x0 ./User/ch32v00x_it.o
  .rela.text.handle_reset
-                0x0000000000000570        0x0 ./User/ch32v00x_it.o
+                0x00000000000006a8        0x0 ./User/ch32v00x_it.o
 
-.fini           0x0000000000000570        0x0
-                0x0000000000000570                PROVIDE (_etext = .)
+.fini           0x00000000000006a8        0x0
+                0x00000000000006a8                PROVIDE (_etext = .)
  *(SORT_NONE(.fini))
-                0x0000000000000570                . = ALIGN (0x4)
+                0x00000000000006a8                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (_eitcm = .)
 
-.preinit_array  0x0000000000000570        0x0
+.preinit_array  0x00000000000006a8        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0000000000000570        0x0
+.init_array     0x00000000000006a8        0x0
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x0000000000000570        0x0
+.fini_array     0x00000000000006a8        0x0
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
@@ -1184,15 +1175,15 @@ END GROUP
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
 
-.dalign         0x0000000020000000        0x0 load address 0x0000000000000570
+.dalign         0x0000000020000000        0x0 load address 0x00000000000006a8
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_data_vma = .)
 
-.dlalign        0x0000000000000570        0x0
-                0x0000000000000570                . = ALIGN (0x4)
-                0x0000000000000570                PROVIDE (_data_lma = .)
+.dlalign        0x00000000000006a8        0x0
+                0x00000000000006a8                . = ALIGN (0x4)
+                0x00000000000006a8                PROVIDE (_data_lma = .)
 
-.data           0x0000000020000000        0x0 load address 0x0000000000000570
+.data           0x0000000020000000        0x0 load address 0x00000000000006a8
                 0x0000000020000000                . = ALIGN (0x4)
  *(.gnu.linkonce.r.*)
  *(.data .data.*)
@@ -1211,7 +1202,7 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_edata = .)
 
-.bss            0x0000000020000000        0x0 load address 0x0000000000000570
+.bss            0x0000000020000000        0x0 load address 0x00000000000006a8
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_sbss = .)
  *(.sbss*)

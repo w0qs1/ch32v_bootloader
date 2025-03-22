@@ -21,6 +21,3 @@
 .equ UART_B_M,      4               // UART Baudrate Mantissa
 .equ UART_B_F,      5               // UART Baudrate Fraction
 
-
-.equ PERI_INIT,     0               // Enable Peripheral Initialization
-

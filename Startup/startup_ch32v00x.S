@@ -174,7 +174,6 @@ handle_reset:
     csrw mtvec, t0
   
     jal   SystemInit
-
     la t0, main
     csrw mepc, t0
     mret

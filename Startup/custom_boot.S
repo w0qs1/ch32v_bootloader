@@ -1,4 +1,4 @@
-.section .custom_boot, "ax"  // Executable code section
+.section .text.bootloader, "ax"  // Executable code section
 .global custom_boot
 
 #include "boot_config.S"
@@ -210,7 +210,7 @@ compute_crc:
     j 1b
 .endif
 
-.section .rodata, "a", @progbits
+.section .rodata.bootloader, "a", @progbits
 .align 4
 msg1: .asciz "POST Starting..\n"
 .if FW_CHECK

@@ -6,7 +6,8 @@ PROVIDE( _stack_size = __stack_size );
 
 MEMORY
 {
-	FLASH (rx) : ORIGIN = 0x00000000, LENGTH = 16K
+	FLASH_BOOT (rx) : ORIGIN = 0x00000000, LENGTH = 1K        /*User alloted space for bootloader. Must be > size of bootloader*/
+  FLASH_APPL (rx) : ORIGIN = 0x00000000 + 1K, LENGTH = 15K  /*Start of application code*/
 	RAM (xrw)  : ORIGIN = 0x20000000, LENGTH = 2K
 }
 
@@ -19,13 +20,13 @@ SECTIONS
       KEEP(*(SORT_NONE(.init)))
       . = ALIGN(4);
       _einit = .;
-    } >FLASH AT>FLASH
+    } >FLASH_BOOT AT>FLASH_BOOT
 
     .highcodelalign : 
     {       
         . = ALIGN(4);
         PROVIDE(_highcode_lma = .); 
-    } >FLASH AT>FLASH 
+    } >FLASH_APPL AT>FLASH_APPL 
     
     .highcode : 
     {
@@ -35,8 +36,16 @@ SECTIONS
         *(.highcode.*);
 		. = ALIGN(4); 
         PROVIDE(_highcode_vma_end = .);
-    } >RAM AT>FLASH
+    } >RAM AT>FLASH_APPL
 
+    /*User add section to ensure that bootloader and application do not share pages in FLASH*/
+    .bootloader :
+    {
+      . = ALIGN(4);
+      *(.text.bootloader)
+      *(.rodata.bootloader)
+    } >FLASH_BOOT AT>FLASH_BOOT
+    
     .text :
     {
       . = ALIGN(4);
@@ -46,14 +55,14 @@ SECTIONS
       *(.rodata*)
       *(.gnu.linkonce.t.*)
       . = ALIGN(4);
-    } >FLASH AT>FLASH 
+    } >FLASH_APPL AT>FLASH_APPL 
 
     .fini :
     {
       PROVIDE( _etext = . );  /* Modified to properly set the end of firmware */
       KEEP(*(SORT_NONE(.fini)))
       . = ALIGN(4);
-    } >FLASH AT>FLASH
+    } >FLASH_APPL AT>FLASH_APPL
 
     /*PROVIDE( _etext = . );*/
     PROVIDE( _eitcm = . );  
@@ -63,7 +72,7 @@ SECTIONS
       PROVIDE_HIDDEN (__preinit_array_start = .);
       KEEP (*(.preinit_array))
       PROVIDE_HIDDEN (__preinit_array_end = .);
-    } >FLASH AT>FLASH 
+    } >FLASH_APPL AT>FLASH_APPL 
   
     .init_array :
     {
@@ -71,7 +80,7 @@ SECTIONS
       KEEP (*(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*)))
       KEEP (*(.init_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .ctors))
       PROVIDE_HIDDEN (__init_array_end = .);
-    } >FLASH AT>FLASH 
+    } >FLASH_APPL AT>FLASH_APPL 
   
     .fini_array :
     {
@@ -79,7 +88,7 @@ SECTIONS
       KEEP (*(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*)))
       KEEP (*(.fini_array EXCLUDE_FILE (*crtbegin.o *crtbegin?.o *crtend.o *crtend?.o ) .dtors))
       PROVIDE_HIDDEN (__fini_array_end = .);
-    } >FLASH AT>FLASH 
+    } >FLASH_APPL AT>FLASH_APPL 
   
     .ctors :
     {
@@ -101,7 +110,7 @@ SECTIONS
       KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .ctors))
       KEEP (*(SORT(.ctors.*)))
       KEEP (*(.ctors))
-    } >FLASH AT>FLASH 
+    } >FLASH_APPL AT>FLASH_APPL 
   
     .dtors :
     {
@@ -110,19 +119,19 @@ SECTIONS
       KEEP (*(EXCLUDE_FILE (*crtend.o *crtend?.o ) .dtors))
       KEEP (*(SORT(.dtors.*)))
       KEEP (*(.dtors))
-    } >FLASH AT>FLASH 
+    } >FLASH_APPL AT>FLASH_APPL 
 
     .dalign :
     {
       . = ALIGN(4);
       PROVIDE(_data_vma = .);
-    } >RAM AT>FLASH  
+    } >RAM AT>FLASH_APPL  
 
     .dlalign :
     {
       . = ALIGN(4); 
       PROVIDE(_data_lma = .);
-    } >FLASH AT>FLASH
+    } >FLASH_APPL AT>FLASH_APPL
 
     .data :
     {
@@ -143,7 +152,7 @@ SECTIONS
       *(.srodata .srodata.*)
       . = ALIGN(4);
       PROVIDE( _edata = .);
-    } >RAM AT>FLASH
+    } >RAM AT>FLASH_APPL
 
     .bss :
     {
@@ -156,7 +165,7 @@ SECTIONS
       *(COMMON*)
       . = ALIGN(4);
       PROVIDE( _ebss = .);
-    } >RAM AT>FLASH
+    } >RAM AT>FLASH_APPL
 
     PROVIDE( _end = _ebss);
 	PROVIDE( end = . );    
