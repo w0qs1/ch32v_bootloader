@@ -13,6 +13,7 @@ MEMORY
 
 SECTIONS
 {
+    /*Startup Code is also placed in bootloader space*/
     .init :
     { 
       _sinit = .;
@@ -38,7 +39,7 @@ SECTIONS
         PROVIDE(_highcode_vma_end = .);
     } >RAM AT>FLASH_APPL
 
-    /*User add section to ensure that bootloader and application do not share pages in FLASH*/
+    /*User added section to ensure that bootloader and application do not share pages in FLASH*/
     .bootloader :
     {
       . = ALIGN(4);
@@ -46,6 +47,7 @@ SECTIONS
       *(.rodata.bootloader)
     } >FLASH_BOOT AT>FLASH_BOOT
     
+    /*Application code and rodata*/
     .text :
     {
       . = ALIGN(4);

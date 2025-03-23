@@ -1,6 +1,11 @@
 .section .text.bootloader, "ax"  // Executable code section
 .global custom_boot
 
+.extern FLASH_Unlock
+.extern FLASH_Lock
+.extern FLASH_ErasePage
+.extern FLASH_ProgramWord
+
 #include "boot_config.S"
 
 custom_boot:
@@ -19,6 +24,41 @@ custom_boot:
 
     jal ra, uart_init
 
+    .if FW_UPGDE
+    jal ra, gpio_init
+    jal ra, gpio_check
+    bne a0, zero, post_start
+
+    // Get firmware from UART
+    la a0, msg6     // Print "Entering Firmware Upgrade mode.."
+    jal ra, print_uart
+
+    // call FLASH_Unlock
+
+    addi t0, zero, 0x010
+    jal ra, uart_getc
+    bne a0, t0, post_start
+
+    add t0, zero, zero
+    jal ra, uart_getc
+    add t0, t0, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 8
+    add t0, t0, a0
+    
+    jal ra, uart_getc
+    slli a0, a0, 16
+    add t0, t0, a0
+    
+    jal ra, uart_getc
+    slli a0, a0, 24
+    add t0, t0, a0
+
+    .endif
+
+post_start:
+    // Check for GPIO here
     la a0, msg1     // Print "POST Starting.."
     jal ra, print_uart
 
@@ -71,23 +111,23 @@ print_uart:
     lw t1, 0(t0)      # Load 4 bytes (little-endian)
 
     # Extract and send each byte in sequence
-    andi t2, t1, 0xFF        # Byte 0
-    beqz t2, done
+    andi a0, t1, 0xFF        # Byte 0
+    beqz a0, done
     jal ra, uart_putc        # Call uart_putc (assuming it preserves ra)
 
     srli t1, t1, 8
-    andi t2, t1, 0xFF        # Byte 1
-    beqz t2, done
+    andi a0, t1, 0xFF        # Byte 1
+    beqz a0, done
     jal ra, uart_putc
 
     srli t1, t1, 8
-    andi t2, t1, 0xFF        # Byte 2
-    beqz t2, done
+    andi a0, t1, 0xFF        # Byte 2
+    beqz a0, done
     jal ra, uart_putc
 
     srli t1, t1, 8
-    andi t2, t1, 0xFF        # Byte 3
-    beqz t2, done
+    andi a0, t1, 0xFF        # Byte 3
+    beqz a0, done
     jal ra, uart_putc
 
     addi t0, t0, 4    # Move to next word
@@ -108,7 +148,7 @@ uart_putc:
     andi s1, s1, (1 << 6)  # Check if TX buffer is empty
     beqz s1, 2b         # Wait if not empty
 
-    sb t2, 4(s0)         # Write character to UART TX
+    sb a0, 4(s0)         # Write character to UART TX
 
     // Delay (This is VERY, VERY Important. Otherwise, the last 2 characters are skipped; idk why)
     li a2, 0x000000C0
@@ -120,6 +160,35 @@ uart_putc:
     addi sp, sp, 4
     jalr x0, 0(ra)      # Return from uart_putc
 
+
+.if FW_UPGDE
+// Blocking UART read function
+uart_getc:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    // USART_STATR
+    li t0, 0x40013800
+1:
+    // Check for RXNE bit
+    addi t2, zero, 0x010
+    lw t1, 0(t0)
+    and t2, t1, t2
+    beq t2, zero, 1b
+
+    // Clear RXNE bit
+    li s0, 0xFFFFFFEF
+    and t1, t1, s0
+    sw t1, 0(t0)
+
+    // USART_DATAR
+    li t0, 0x40013804
+    lbu a0, 0(t0)
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    jalr x0, 0(ra)
+.endif
 
 uart_init:
     addi sp, sp, -4
@@ -143,11 +212,17 @@ uart_init:
     // addi t1, zero, ((UART_B_M << 4) | UART_B_F)
     sw t1, 0(t0)
 
-    // Set Transmit Enable, USART Enable in USART_CTRL1
+    // Set Transmit Enable, Receive Enable (only if FW_UPGDE), USART Enable in USART_CTRL1
     addi t0, t0, 4
     addi t1, zero, 1
     slli t1, t1, 13
+
+    .if FW_UPGDE
+    addi t1, t1, 12
+    .else
     addi t1, t1, 8
+    .endif
+
     sw t1, 0(t0)
 
     // Set GPIO D5 as output for TX
@@ -177,6 +252,41 @@ uart_init:
     lw ra, 0(sp)
     addi sp, sp, 4
     jalr x0, 0(ra)
+
+.if FW_UPGDE
+gpio_init:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+    // Set Input Mode for PD0 in GPIOD_CFGLR
+    li t0, 0x40011400
+    lw t1, 0(t0)
+    li t2, 0xFFFFFFF0
+    and t1, t1, t2
+    ori t1, t1, 0x008
+    sw t1, 0(t0)
+
+    // Set Pull up Mode in GPIOD_ODR
+    lw t1, 12(t0)
+    ori t1, t1, 0x001
+    sw t1, 12(t0)
+
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    jalr x0, 0(ra)
+
+gpio_check:
+    // Get GPIOD_IDR
+    li t0, 0x40011408
+    lw t1, 0(t0)
+
+    // Mask Bit 0
+    addi t2, zero, 0x001
+    // Return Value of Bit 0 (PD0)
+    and a0, t2, t1
+    
+    jalr x0, 0(ra)
+.endif
 
 .if FW_CHECK
 compute_crc:
@@ -225,4 +335,9 @@ msg3: .asciz "No Firmware Check enabled..\n"
 msg4: .asciz "Firmware corrupted!\n"
 .align 4
 msg5: .asciz "Firmware OK..\n"
+.endif
+
+.if FW_UPGDE
+.align 4
+msg6: .asciz "Entering Firmware Upgrade mode..\n"
 .endif
