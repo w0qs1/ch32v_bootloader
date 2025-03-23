@@ -6,8 +6,8 @@ PROVIDE( _stack_size = __stack_size );
 
 MEMORY
 {
-	FLASH_BOOT (rx) : ORIGIN = 0x00000000, LENGTH = 1K        /*User alloted space for bootloader. Must be > size of bootloader*/
-  FLASH_APPL (rx) : ORIGIN = 0x00000000 + 1K, LENGTH = 15K  /*Start of application code*/
+	FLASH_BOOT (rx) : ORIGIN = 0x00000000, LENGTH = 2K        /*User alloted space for bootloader. Must be > size of bootloader*/
+  FLASH_APPL (rx) : ORIGIN = 0x00000000 + 2K, LENGTH = 14K  /*Start of application code*/
 	RAM (xrw)  : ORIGIN = 0x20000000, LENGTH = 2K
 }
 

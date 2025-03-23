@@ -1,14 +1,27 @@
 .section .text.bootloader, "ax"  // Executable code section
 .global custom_boot
 
-.extern FLASH_Unlock
-.extern FLASH_Lock
-.extern FLASH_ErasePage
-.extern FLASH_ProgramWord
-
-.equ    ACK,    0x01
-
 #include "boot_config.S"
+
+.ifdef FW_UPGDE
+.extern handle_fw_upgrade
+.endif
+// .ifdef FW_UPGDE
+// .extern FLASH_Unlock
+// .extern FLASH_Lock
+// .extern FLASH_ErasePage
+// .extern FLASH_ProgramWord
+
+// .equ    NACK,               0x00
+// .equ    ACK,                0x01
+// .equ    PING,               0x02
+// .equ    CMD_FLASH_UNLOCK,   0x03
+// .equ    CMD_FLASH_LOCK,     0x04
+// .equ    CMD_FLASH_PR,       0x05
+// .equ    CMD_FLASH_PE,       0x06
+// .equ    CMD_FLASH_EA,       0x07
+// .equ    CMD_FLASH_WH,       0x08
+// .endif
 
 custom_boot:
     // Initialize UART
@@ -26,48 +39,96 @@ custom_boot:
 
     jal ra, uart_init
 
-    .if FW_UPGDE
-    jal ra, gpio_init
-    jal ra, gpio_check
-    bne a0, zero, post_start
+.if FW_UPGDE
+    call handle_fw_upgrade
+.endif
 
-    // Get firmware from UART
-    la a0, msg6     // Print "Entering Firmware Upgrade mode.."
-    jal ra, print_uart
+// .if FW_UPGDE
+//     jal ra, gpio_init
+//     jal ra, gpio_check
+//     bne a0, zero, post_start
 
-    // call FLASH_Unlock
+//     // Get firmware from UART
+//     la a0, msg6     // Print "Entering Firmware Upgrade mode.."
+//     jal ra, print_uart
 
-    jal ra, uart_getc
-    addi s1, zero, 0x010
-    bne a0, s1, post_start
-    addi a0, zero, ACK
-    jal ra, uart_putc
+// get_cmd:
+//     jal ra, uart_getc
+//     addi s1, zero, CMD_FLASH_UNLOCK
+//     beq a0, s1, ACT_FLASH_UNLOCK
 
-    jal ra, uart_getc
-    add s1, zero, zero
-    add s1, s1, a0
-    addi a0, zero, ACK
-    jal ra, uart_putc
+//     addi s1, zero, CMD_FLASH_LOCK
+//     beq a0, s1, ACT_FLASH_LOCK
 
-    jal ra, uart_getc
-    slli a0, a0, 8
-    add s1, s1, a0
-    addi a0, zero, ACK
-    jal ra, uart_putc
+//     addi s1, zero, CMD_FLASH_PR
+//     beq a0, s1, ACT_FLASH_PR
+
+//     addi s1, zero, CMD_FLASH_PE
+//     beq a0, s1, ACT_FLASH_PE
+
+//     addi s1, zero, CMD_FLASH_EA
+//     beq a0, s1, ACT_FLASH_EA
+
+//     addi s1, zero, CMD_FLASH_WH
+//     beq a0, s1, ACT_FLASH_WH
+
+//     beq x0, x0, get_cmd
     
-    jal ra, uart_getc
-    slli a0, a0, 16
-    add s1, s1, a0
-    addi a0, zero, ACK
-    jal ra, uart_putc
-    
-    jal ra, uart_getc
-    slli a0, a0, 24
-    add s1, s1, a0
-    addi a0, zero, ACK
-    jal ra, uart_putc
+// ACT_FLASH_UNLOCK:
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
 
-    .endif
+//     call FLASH_Unlock
+
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
+
+//     beq x0, x0, get_cmd
+
+// ACT_FLASH_LOCK:
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
+
+//     call FLASH_Lock
+    
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
+
+//     beq x0, x0, get_cmd
+
+// CMD_FLASH_PR:
+//     jal ra, uart_getc
+//     call FLASH_ErasePage
+
+// ACT_FLASH_PR:
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
+
+//     jal ra, uart_getc
+//     add s1, zero, zero
+//     add s1, s1, a0
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
+
+//     jal ra, uart_getc
+//     slli a0, a0, 8
+//     add s1, s1, a0
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
+    
+//     jal ra, uart_getc
+//     slli a0, a0, 16
+//     add s1, s1, a0
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
+    
+//     jal ra, uart_getc
+//     slli a0, a0, 24
+//     add s1, s1, a0
+//     addi a0, zero, ACK
+//     jal ra, uart_putc
+
+// .endif
 
 post_start:
     // Check for GPIO here
@@ -114,6 +175,7 @@ fw_correct:
     addi sp, sp, 4
     jalr x0, 0(ra)  // Ensure execution flows into the standard startup
 
+.global print_uart
 print_uart:
     addi sp, sp, -4
     sw ra, 0(sp)         # Save return address
@@ -150,6 +212,7 @@ done:
     addi sp, sp, 4
     jalr x0, 0(ra)    # Return from subroutine
 
+.global uart_putc
 uart_putc:
     addi sp, sp, -4
     sw ra, 0(sp)         # Save return address
@@ -174,6 +237,7 @@ uart_putc:
 
 
 .if FW_UPGDE
+.global uart_getc
 // Blocking UART read function
 uart_getc:
     addi sp, sp, -4
@@ -266,6 +330,7 @@ uart_init:
     jalr x0, 0(ra)
 
 .if FW_UPGDE
+.global gpio_init
 gpio_init:
     addi sp, sp, -4
     sw ra, 0(sp)
@@ -287,6 +352,8 @@ gpio_init:
     addi sp, sp, 4
     jalr x0, 0(ra)
 
+
+.global gpio_check
 gpio_check:
     // Get GPIOD_IDR
     li t0, 0x40011408
@@ -347,9 +414,4 @@ msg3: .asciz "No Firmware Check enabled..\n"
 msg4: .asciz "Firmware corrupted!\n"
 .align 4
 msg5: .asciz "Firmware OK..\n"
-.endif
-
-.if FW_UPGDE
-.align 4
-msg6: .asciz "Entering Firmware Upgrade mode..\n"
 .endif
