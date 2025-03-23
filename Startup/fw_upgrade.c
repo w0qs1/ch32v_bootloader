@@ -83,12 +83,12 @@ void handle_fw_upgrade(void) {
                 }
 
                 page_start = (uint32_t *) (FLASH_BASE + ((uart_rx & 0xFF) * 64));
-                
+
                 temp = compute_crc(page_start, 64);
-                uart_putc(temp & 0x000000FF);
-                uart_putc((temp & 0x0000FF00) >> 8);
-                uart_putc((temp & 0x00FF0000) >> 16);
                 uart_putc((temp & 0xFF000000) >> 24);
+                uart_putc((temp & 0x00FF0000) >> 16);
+                uart_putc((temp & 0x0000FF00) >> 8);
+                uart_putc(temp & 0x000000FF);
 
                 break;
 
