@@ -6,6 +6,8 @@
 .extern FLASH_ErasePage
 .extern FLASH_ProgramWord
 
+.equ    ACK,    0x01
+
 #include "boot_config.S"
 
 custom_boot:
@@ -35,25 +37,35 @@ custom_boot:
 
     // call FLASH_Unlock
 
-    addi t0, zero, 0x010
     jal ra, uart_getc
-    bne a0, t0, post_start
+    addi s1, zero, 0x010
+    bne a0, s1, post_start
+    addi a0, zero, ACK
+    jal ra, uart_putc
 
-    add t0, zero, zero
     jal ra, uart_getc
-    add t0, t0, a0
+    add s1, zero, zero
+    add s1, s1, a0
+    addi a0, zero, ACK
+    jal ra, uart_putc
 
     jal ra, uart_getc
     slli a0, a0, 8
-    add t0, t0, a0
+    add s1, s1, a0
+    addi a0, zero, ACK
+    jal ra, uart_putc
     
     jal ra, uart_getc
     slli a0, a0, 16
-    add t0, t0, a0
+    add s1, s1, a0
+    addi a0, zero, ACK
+    jal ra, uart_putc
     
     jal ra, uart_getc
     slli a0, a0, 24
-    add t0, t0, a0
+    add s1, s1, a0
+    addi a0, zero, ACK
+    jal ra, uart_putc
 
     .endif
 

@@ -1056,16 +1056,16 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_highcode_vma_end = .)
 
-.bootloader     0x00000000000000a0      0x302
+.bootloader     0x00000000000000a0      0x332
                 0x00000000000000a0                . = ALIGN (0x4)
  *(.text.bootloader)
  .text.bootloader
-                0x00000000000000a0      0x24e ./Startup/custom_boot.o
+                0x00000000000000a0      0x276 ./Startup/custom_boot.o
                 0x00000000000000a0                custom_boot
  *(.rodata.bootloader)
- *fill*         0x00000000000002ee        0x2 
+ *fill*         0x0000000000000316        0xa 
  .rodata.bootloader
-                0x00000000000002f0       0xb2 ./Startup/custom_boot.o
+                0x0000000000000320       0xb2 ./Startup/custom_boot.o
 
 .text           0x0000000000000400      0x2a8
                 0x0000000000000400                . = ALIGN (0x4)
@@ -1261,13 +1261,13 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_ranges  0x00000000000000c8       0x28 ./Startup/startup_ch32v00x.o
  .debug_ranges  0x00000000000000f0       0xd0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_line     0x0000000000000000     0x2225
+.debug_line     0x0000000000000000     0x2261
  .debug_line    0x0000000000000000      0x346 ./User/ch32v00x_it.o
  .debug_line    0x0000000000000346      0x30e ./User/main.o
  .debug_line    0x0000000000000654      0x785 ./User/system_ch32v00x.o
- .debug_line    0x0000000000000dd9      0x44b ./Startup/custom_boot.o
- .debug_line    0x0000000000001224      0x14e ./Startup/startup_ch32v00x.o
- .debug_line    0x0000000000001372      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_line    0x0000000000000dd9      0x487 ./Startup/custom_boot.o
+ .debug_line    0x0000000000001260      0x14e ./Startup/startup_ch32v00x.o
+ .debug_line    0x00000000000013ae      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
 
 .debug_str      0x0000000000000000      0xb5e
  .debug_str     0x0000000000000000      0x637 ./User/ch32v00x_it.o
