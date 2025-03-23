@@ -1,5 +1,6 @@
 #include <ch32v00x_flash.h>
 
+// Fuctions from custom_boot
 extern void uart_putc(uint32_t);
 extern uint32_t uart_getc(void);
 extern void print_uart(uint8_t *);
@@ -36,10 +37,32 @@ void handle_fw_upgrade(void) {
         uart_rx = uart_getc();
         switch(uart_rx) {
             case PING:
-                uart_putc(0x01);
+                uart_putc(ACK);
                 break;
 
-            case 
+            case CMD_FLASH_UNLOCK:
+                FLASH_Unlock();
+                uart_putc(ACK);
+                break;
+
+            case CMD_FLASH_LOCK:
+                FLASH_Lock();
+                uart_putc(ACK);
+                break;
+
+            case CMD_FLASH_PR:
+                // Get page address
+                uart_rx = uart_getc();
+
+                // Cannot read bootloader partition (2K - 32 Pages)
+                if (uart_rx < 32) {
+                    uart_putc(NACK);
+                }
+                uart_putc(ACK);
+
+                
+                break;
+
             default:
                 break;
         }
