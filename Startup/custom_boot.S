@@ -335,6 +335,15 @@ gpio_init:
     addi sp, sp, -4
     sw ra, 0(sp)
 
+    // [RCC_APB2_ENR] in t0
+    lui t0, 0x40021
+    addi t0, t0, 0x018
+
+    // set bit 5 (enable clock for gpio d)
+    lw t1, 0(t0)
+    ori t1, t1, 32
+    sw t1, 0(t0)
+    
     // Set Input Mode for PD0 in GPIOD_CFGLR
     li t0, 0x40011400
     lw t1, 0(t0)
@@ -365,9 +374,28 @@ gpio_check:
     and a0, t2, t1
     
     jalr x0, 0(ra)
+
+.global read_flash
+read_flash:
+    addi sp, sp, -4
+    sw ra, 0(sp)
+
+1:
+    beq a0, a2, 2f
+    lw s1, 0(a0)
+    sw s1, 0(a1)
+    addi a0, a0, 4
+    addi a1, a1, 4
+    beq x0, x0, 1b
+
+2:
+    lw ra, 0(sp)
+    addi sp, sp, 4
+    jalr x0, 0(ra)
 .endif
 
 .if FW_CHECK
+.global compute_crc
 compute_crc:
     addi sp, sp, -4
     sw ra, 0(sp)
