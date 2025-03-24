@@ -1,9 +1,10 @@
 #include <ch32v00x_flash.h>
+#include <stdint.h>
 
 // Fuctions from custom_boot
 extern void uart_putc(uint32_t);
 extern uint32_t uart_getc(void);
-extern void print_uart(uint8_t *);
+extern void print_uart(const uint8_t *);
 extern void gpio_init(void);
 extern uint32_t gpio_check(void);
 extern uint32_t compute_crc(volatile uint32_t *, volatile uint32_t);
@@ -20,15 +21,19 @@ extern void read_flash(volatile uint32_t *, volatile uint32_t *, volatile uint32
 #define EXIT                0xFF
 
 __attribute__((section(".rodata.bootloader")))
-uint8_t fw_msg_1[] = "Entering Firmware Upgrade mode..\n";
+const uint8_t fw_msg_1[] = "Entering Firmware Upgrade mode..\n";
 
 __attribute__((section(".rodata.bootloader")))
-uint8_t fw_msg_2[] = "Exiting Firmware Upgrade mode!\n";
+const uint8_t fw_msg_2[] = "Exiting Firmware Upgrade mode!\n";
 
 __attribute__((section(".text.bootloader")))
 void handle_fw_upgrade(void) {
     uint32_t fw_button;
     volatile uint32_t uart_rx;
+    volatile uint32_t *page_start;
+    volatile uint32_t page_in_mem[64];
+    volatile uint32_t temp;
+
     gpio_init();
     fw_button = gpio_check();
     if(fw_button == 1) {
@@ -46,12 +51,12 @@ void handle_fw_upgrade(void) {
                 break;
 
             case CMD_FLASH_UNLOCK:
-                FLASH_Unlock();
+                FLASH_Unlock_Fast();
                 uart_putc(ACK);
                 break;
 
             case CMD_FLASH_LOCK:
-                FLASH_Lock();
+                FLASH_Lock_Fast();
                 uart_putc(ACK);
                 break;
 
@@ -62,14 +67,12 @@ void handle_fw_upgrade(void) {
                 // Trying to read bootloader or location out of flash
                 if (uart_rx < 0x30 || uart_rx > 0xFF) {
                     uart_putc(NACK);
-                    return;
+                    break;
                 }
 
                 uart_putc(ACK);
 
-                volatile uint32_t *page_start = (uint32_t *) (FLASH_BASE + ((uart_rx & 0xFF) * 64));
-                volatile uint32_t page_in_mem[64];
-                volatile uint32_t temp;
+                page_start = (uint32_t *) (0x08000000 + ((uart_rx & 0xFF) * 64));
 
                 read_flash(page_start, page_in_mem, page_start + 16);
 
@@ -82,7 +85,8 @@ void handle_fw_upgrade(void) {
                     uart_putc((temp & 0xFF000000) >> 24);
                 }
 
-                page_start = (uint32_t *) (FLASH_BASE + ((uart_rx & 0xFF) * 64));
+                // Set page_start again as this is getting changed
+                page_start = (uint32_t *) (0x00000000 + ((uart_rx & 0xFF) * 64));
 
                 temp = compute_crc(page_start, 64);
                 uart_putc((temp & 0xFF000000) >> 24);
@@ -92,6 +96,21 @@ void handle_fw_upgrade(void) {
 
                 break;
 
+            case CMD_FLASH_PE:
+                // Get page address
+                uart_rx = uart_getc();
+
+                // Trying to read bootloader or location out of flash
+                if (uart_rx < 0x30 || uart_rx > 0xFF) {
+                    uart_putc(NACK);
+                    break;
+                }
+
+                FLASH_ErasePage_Fast(0x08000000 + ((uart_rx & 0xFF) * 64));
+
+                uart_putc(ACK);
+
+                break;
             case EXIT:
             default:
                 print_uart(fw_msg_2);

@@ -1,7 +1,7 @@
 Archive member included to satisfy reference by file (symbol)
 
 c:/mounriver/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/rv32ecxw/ilp32e\libgcc.a(save-restore.o)
-                              ./Peripheral/src/ch32v00x_flash.o (__riscv_save_2)
+                              ./Startup/fw_upgrade.o (__riscv_save_2)
 c:/mounriver/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/rv32ecxw/ilp32e\libgcc.a(muldi3.o)
                               ./Debug/debug.o (__mulsi3)
 c:/mounriver/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/rv32ecxw/ilp32e\libgcc.a(div.o)
@@ -215,6 +215,10 @@ Discarded input sections
                 0x0000000000000000       0x60 ./Peripheral/src/ch32v00x_flash.o
  .text.FLASH_SetLatency
                 0x0000000000000000        0xe ./Peripheral/src/ch32v00x_flash.o
+ .text.FLASH_Unlock
+                0x0000000000000000       0x1a ./Peripheral/src/ch32v00x_flash.o
+ .text.FLASH_Lock
+                0x0000000000000000        0xe ./Peripheral/src/ch32v00x_flash.o
  .text.FLASH_GetUserOptionByte
                 0x0000000000000000        0xa ./Peripheral/src/ch32v00x_flash.o
  .text.FLASH_GetWriteProtectionOptionByte
@@ -253,15 +257,9 @@ Discarded input sections
                 0x0000000000000000       0x7a ./Peripheral/src/ch32v00x_flash.o
  .text.FLASH_WaitForLastBank1Operation
                 0x0000000000000000       0x18 ./Peripheral/src/ch32v00x_flash.o
- .text.FLASH_Unlock_Fast
-                0x0000000000000000       0x1e ./Peripheral/src/ch32v00x_flash.o
- .text.FLASH_Lock_Fast
-                0x0000000000000000        0xe ./Peripheral/src/ch32v00x_flash.o
  .text.FLASH_BufReset
                 0x0000000000000000       0x28 ./Peripheral/src/ch32v00x_flash.o
  .text.FLASH_BufLoad
-                0x0000000000000000       0x36 ./Peripheral/src/ch32v00x_flash.o
- .text.FLASH_ErasePage_Fast
                 0x0000000000000000       0x36 ./Peripheral/src/ch32v00x_flash.o
  .text.FLASH_ProgramPage_Fast
                 0x0000000000000000       0x34 ./Peripheral/src/ch32v00x_flash.o
@@ -1046,7 +1044,7 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_highcode_vma_end = .)
 
-.bootloader     0x00000000000000a0      0x434
+.bootloader     0x00000000000000a0      0x528
                 0x00000000000000a0                . = ALIGN (0x4)
  *(.text.bootloader)
  .text.bootloader
@@ -1060,19 +1058,23 @@ END GROUP
                 0x000000000000028c                read_flash
                 0x00000000000002a8                compute_crc
  .text.bootloader
-                0x00000000000002ea      0x114 ./Startup/fw_upgrade.o
+                0x00000000000002ea      0x12e ./Startup/fw_upgrade.o
                 0x00000000000002ea                handle_fw_upgrade
+ *(.text.handle_reset)
+ .text.handle_reset
+                0x0000000000000418       0xbc ./Startup/startup_ch32v00x.o
+                0x0000000000000418                handle_reset
  *(.rodata.bootloader)
- *fill*         0x00000000000003fe        0x2 
+ *fill*         0x00000000000004d4        0xc 
  .rodata.bootloader
-                0x0000000000000400       0x8f ./Startup/custom_boot.o
- *fill*         0x000000000000048f        0x1 
+                0x00000000000004e0       0x8f ./Startup/custom_boot.o
+ *fill*         0x000000000000056f        0x1 
  .rodata.bootloader
-                0x0000000000000490       0x44 ./Startup/fw_upgrade.o
-                0x0000000000000490                fw_msg_1
-                0x00000000000004b4                fw_msg_2
+                0x0000000000000570       0x58 ./Startup/fw_upgrade.o
+                0x0000000000000584                fw_msg_1
+                0x00000000000005a8                fw_msg_2
 
-.text           0x0000000000000c00      0x2d8
+.text           0x0000000000000c00      0x258
                 0x0000000000000c00                . = ALIGN (0x4)
  *(.text)
  .text          0x0000000000000c00       0x14 c:/mounriver/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/rv32ecxw/ilp32e\libgcc.a(save-restore.o)
@@ -1125,48 +1127,49 @@ END GROUP
                 0x0000000000000de0                FLASH_IRQHandler
                 0x0000000000000de0                USART1_IRQHandler
                 0x0000000000000de0                I2C1_ER_IRQHandler
- .text.handle_reset
-                0x0000000000000de2       0xbc ./Startup/startup_ch32v00x.o
-                0x0000000000000de2                handle_reset
- .text.FLASH_Unlock
-                0x0000000000000e9e       0x1a ./Peripheral/src/ch32v00x_flash.o
-                0x0000000000000e9e                FLASH_Unlock
- .text.FLASH_Lock
-                0x0000000000000eb8        0xe ./Peripheral/src/ch32v00x_flash.o
-                0x0000000000000eb8                FLASH_Lock
+ .text.FLASH_Unlock_Fast
+                0x0000000000000de2       0x1e ./Peripheral/src/ch32v00x_flash.o
+                0x0000000000000de2                FLASH_Unlock_Fast
+ .text.FLASH_Lock_Fast
+                0x0000000000000e00        0xe ./Peripheral/src/ch32v00x_flash.o
+                0x0000000000000e00                FLASH_Lock_Fast
+ .text.FLASH_ErasePage_Fast
+                0x0000000000000e0e       0x36 ./Peripheral/src/ch32v00x_flash.o
+                0x0000000000000e0e                FLASH_ErasePage_Fast
  .text.RCC_AdjustHSICalibrationValue
-                0x0000000000000ec6       0x12 ./Peripheral/src/ch32v00x_rcc.o
-                0x0000000000000ec6                RCC_AdjustHSICalibrationValue
+                0x0000000000000e44       0x12 ./Peripheral/src/ch32v00x_rcc.o
+                0x0000000000000e44                RCC_AdjustHSICalibrationValue
  *(.rodata)
  *(.rodata*)
  *(.gnu.linkonce.t.*)
-                0x0000000000000ed8                . = ALIGN (0x4)
+                0x0000000000000e58                . = ALIGN (0x4)
+ *fill*         0x0000000000000e56        0x2 
 
-.rela.dyn       0x0000000000000ed8        0x0
+.rela.dyn       0x0000000000000e58        0x0
  .rela.text.bootloader
-                0x0000000000000ed8        0x0 ./User/ch32v00x_it.o
- .rela.init     0x0000000000000ed8        0x0 ./User/ch32v00x_it.o
+                0x0000000000000e58        0x0 ./User/ch32v00x_it.o
+ .rela.init     0x0000000000000e58        0x0 ./User/ch32v00x_it.o
  .rela.text.handle_reset
-                0x0000000000000ed8        0x0 ./User/ch32v00x_it.o
+                0x0000000000000e58        0x0 ./User/ch32v00x_it.o
 
-.fini           0x0000000000000ed8        0x0
-                0x0000000000000ed8                PROVIDE (_etext = .)
+.fini           0x0000000000000e58        0x0
+                0x0000000000000e58                PROVIDE (_etext = .)
  *(SORT_NONE(.fini))
-                0x0000000000000ed8                . = ALIGN (0x4)
+                0x0000000000000e58                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (_eitcm = .)
 
-.preinit_array  0x0000000000000ed8        0x0
+.preinit_array  0x0000000000000e58        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0000000000000ed8        0x0
+.init_array     0x0000000000000e58        0x0
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x0000000000000ed8        0x0
+.fini_array     0x0000000000000e58        0x0
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
@@ -1186,15 +1189,15 @@ END GROUP
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
 
-.dalign         0x0000000020000000        0x0 load address 0x0000000000000ed8
+.dalign         0x0000000020000000        0x0 load address 0x0000000000000e58
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_data_vma = .)
 
-.dlalign        0x0000000000000ed8        0x0
-                0x0000000000000ed8                . = ALIGN (0x4)
-                0x0000000000000ed8                PROVIDE (_data_lma = .)
+.dlalign        0x0000000000000e58        0x0
+                0x0000000000000e58                . = ALIGN (0x4)
+                0x0000000000000e58                PROVIDE (_data_lma = .)
 
-.data           0x0000000020000000        0x0 load address 0x0000000000000ed8
+.data           0x0000000020000000        0x0 load address 0x0000000000000e58
                 0x0000000020000000                . = ALIGN (0x4)
  *(.gnu.linkonce.r.*)
  *(.data .data.*)
@@ -1213,7 +1216,7 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_edata = .)
 
-.bss            0x0000000020000000        0x0 load address 0x0000000000000ed8
+.bss            0x0000000020000000        0x0 load address 0x0000000000000e58
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_sbss = .)
  *(.sbss*)
@@ -1235,25 +1238,25 @@ END GROUP
                 0x0000000020000800                PROVIDE (_eusrstack = .)
 OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
 
-.debug_info     0x0000000000000000     0x4a9f
+.debug_info     0x0000000000000000     0x4aab
  .debug_info    0x0000000000000000      0xbc0 ./User/ch32v00x_it.o
  .debug_info    0x0000000000000bc0      0x145 ./User/main.o
  .debug_info    0x0000000000000d05      0xc94 ./User/system_ch32v00x.o
  .debug_info    0x0000000000001999       0x26 ./Startup/custom_boot.o
- .debug_info    0x00000000000019bf      0xbb1 ./Startup/fw_upgrade.o
- .debug_info    0x0000000000002570       0x22 ./Startup/startup_ch32v00x.o
- .debug_info    0x0000000000002592     0x1481 ./Peripheral/src/ch32v00x_flash.o
- .debug_info    0x0000000000003a13     0x108c ./Peripheral/src/ch32v00x_rcc.o
+ .debug_info    0x00000000000019bf      0xbbd ./Startup/fw_upgrade.o
+ .debug_info    0x000000000000257c       0x22 ./Startup/startup_ch32v00x.o
+ .debug_info    0x000000000000259e     0x1481 ./Peripheral/src/ch32v00x_flash.o
+ .debug_info    0x0000000000003a1f     0x108c ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_abbrev   0x0000000000000000     0x1000
+.debug_abbrev   0x0000000000000000     0x100b
  .debug_abbrev  0x0000000000000000      0x22c ./User/ch32v00x_it.o
  .debug_abbrev  0x000000000000022c       0xdf ./User/main.o
  .debug_abbrev  0x000000000000030b      0x2ee ./User/system_ch32v00x.o
  .debug_abbrev  0x00000000000005f9       0x14 ./Startup/custom_boot.o
- .debug_abbrev  0x000000000000060d      0x25e ./Startup/fw_upgrade.o
- .debug_abbrev  0x000000000000086b       0x12 ./Startup/startup_ch32v00x.o
- .debug_abbrev  0x000000000000087d      0x3fa ./Peripheral/src/ch32v00x_flash.o
- .debug_abbrev  0x0000000000000c77      0x389 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_abbrev  0x000000000000060d      0x269 ./Startup/fw_upgrade.o
+ .debug_abbrev  0x0000000000000876       0x12 ./Startup/startup_ch32v00x.o
+ .debug_abbrev  0x0000000000000888      0x3fa ./Peripheral/src/ch32v00x_flash.o
+ .debug_abbrev  0x0000000000000c82      0x389 ./Peripheral/src/ch32v00x_rcc.o
 
 .debug_aranges  0x0000000000000000      0x2d8
  .debug_aranges
@@ -1273,24 +1276,24 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_aranges
                 0x00000000000001f8       0xe0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_ranges   0x0000000000000000      0x308
+.debug_ranges   0x0000000000000000      0x2e8
  .debug_ranges  0x0000000000000000       0x18 ./User/ch32v00x_it.o
  .debug_ranges  0x0000000000000018       0x60 ./User/main.o
  .debug_ranges  0x0000000000000078       0x50 ./User/system_ch32v00x.o
- .debug_ranges  0x00000000000000c8       0x48 ./Startup/fw_upgrade.o
- .debug_ranges  0x0000000000000110       0x28 ./Startup/startup_ch32v00x.o
- .debug_ranges  0x0000000000000138      0x100 ./Peripheral/src/ch32v00x_flash.o
- .debug_ranges  0x0000000000000238       0xd0 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_ranges  0x00000000000000c8       0x28 ./Startup/fw_upgrade.o
+ .debug_ranges  0x00000000000000f0       0x28 ./Startup/startup_ch32v00x.o
+ .debug_ranges  0x0000000000000118      0x100 ./Peripheral/src/ch32v00x_flash.o
+ .debug_ranges  0x0000000000000218       0xd0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_line     0x0000000000000000     0x44cb
+.debug_line     0x0000000000000000     0x453d
  .debug_line    0x0000000000000000      0x346 ./User/ch32v00x_it.o
  .debug_line    0x0000000000000346      0x30e ./User/main.o
  .debug_line    0x0000000000000654      0x785 ./User/system_ch32v00x.o
  .debug_line    0x0000000000000dd9      0x43a ./Startup/custom_boot.o
- .debug_line    0x0000000000001213      0x5d9 ./Startup/fw_upgrade.o
- .debug_line    0x00000000000017ec      0x14e ./Startup/startup_ch32v00x.o
- .debug_line    0x000000000000193a     0x1cde ./Peripheral/src/ch32v00x_flash.o
- .debug_line    0x0000000000003618      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_line    0x0000000000001213      0x64b ./Startup/fw_upgrade.o
+ .debug_line    0x000000000000185e      0x14e ./Startup/startup_ch32v00x.o
+ .debug_line    0x00000000000019ac     0x1cde ./Peripheral/src/ch32v00x_flash.o
+ .debug_line    0x000000000000368a      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
 
 .debug_str      0x0000000000000000     0x105e
  .debug_str     0x0000000000000000      0x637 ./User/ch32v00x_it.o
@@ -1301,11 +1304,11 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
                                         0x763 (size before relaxing)
  .debug_str     0x00000000000007ed       0x25 ./Startup/custom_boot.o
                                          0x6a (size before relaxing)
- .debug_str     0x0000000000000812       0xcd ./Startup/fw_upgrade.o
-                                        0x67c (size before relaxing)
- .debug_str     0x00000000000008df       0x1e ./Startup/startup_ch32v00x.o
+ .debug_str     0x0000000000000812       0xec ./Startup/fw_upgrade.o
+                                        0x69b (size before relaxing)
+ .debug_str     0x00000000000008fe       0x1e ./Startup/startup_ch32v00x.o
                                          0x6f (size before relaxing)
- .debug_str     0x00000000000008fd      0x46c ./Peripheral/src/ch32v00x_flash.o
+ .debug_str     0x000000000000091c      0x44d ./Peripheral/src/ch32v00x_flash.o
                                         0xad0 (size before relaxing)
  .debug_str     0x0000000000000d69      0x2f5 ./Peripheral/src/ch32v00x_rcc.o
                                         0x9cc (size before relaxing)
@@ -1327,8 +1330,8 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_frame   0x0000000000000104      0x324 ./Peripheral/src/ch32v00x_flash.o
  .debug_frame   0x0000000000000428      0x1dc ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_loc      0x0000000000000000     0x114f
+.debug_loc      0x0000000000000000     0x114b
  .debug_loc     0x0000000000000000       0x55 ./User/system_ch32v00x.o
- .debug_loc     0x0000000000000055       0x47 ./Startup/fw_upgrade.o
- .debug_loc     0x000000000000009c      0xad0 ./Peripheral/src/ch32v00x_flash.o
- .debug_loc     0x0000000000000b6c      0x5e3 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_loc     0x0000000000000055       0x43 ./Startup/fw_upgrade.o
+ .debug_loc     0x0000000000000098      0xad0 ./Peripheral/src/ch32v00x_flash.o
+ .debug_loc     0x0000000000000b68      0x5e3 ./Peripheral/src/ch32v00x_rcc.o

@@ -44,6 +44,7 @@ SECTIONS
     {
       . = ALIGN(4);
       *(.text.bootloader)
+      *(.text.handle_reset)
       *(.rodata.bootloader)
     } >FLASH_BOOT AT>FLASH_BOOT
     
