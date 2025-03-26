@@ -18,6 +18,7 @@ extern void read_flash(volatile uint32_t *, volatile uint32_t *, volatile uint32
 #define CMD_FLASH_PR        0x05
 #define CMD_FLASH_PE        0x06
 #define CMD_FLASH_PW        0x07
+#define CONTINUE            0x08
 #define EXIT                0xFF
 
 __attribute__((section(".rodata.bootloader")))
@@ -32,6 +33,7 @@ void handle_fw_upgrade(void) {
     volatile uint32_t uart_rx;
     volatile uint32_t *page_start;
     volatile uint32_t page_in_mem[64];
+    volatile uint32_t buf[16];
     volatile uint32_t temp;
 
     gpio_init();
@@ -111,6 +113,35 @@ void handle_fw_upgrade(void) {
                 uart_putc(ACK);
 
                 break;
+
+            case CMD_FLASH_PW:
+                // Get page address
+                temp = uart_getc();
+
+                // Trying to write bootloader or location out of flash
+                if (temp < 0x30 || temp > 0xFF) {
+                    uart_putc(NACK);
+                    break;
+                }
+
+                // Get data (64B) in big endian
+                for(uint8_t i = 0; i < 16; i++) {
+                    for(uint8_t j = 0; j < 4; j++) {
+                        uart_rx = uart_getc();
+                        buf[i] = buf[i] << 8;
+                        buf[i] |= uart_rx & 0xFF;
+                    }
+                    // buf[i] = ((uart_getc() & 0xFF) << 24);
+                    // buf[i] |= ((uart_getc() & 0xFF) << 16);
+                    // buf[i] |= ((uart_getc() & 0xFF) << 8);
+                    // buf[i] |= uart_getc() & 0xFF;
+                    
+                }
+
+                uart_rx = FLASH_ROM_WRITE(0x08000000 + ((temp & 0xFF) * 64), (uint32_t *) buf, 64);
+                uart_putc(uart_rx);
+                break;
+
             case EXIT:
             default:
                 print_uart(fw_msg_2);
