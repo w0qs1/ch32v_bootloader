@@ -39,7 +39,6 @@ endif
 # Add inputs and outputs from these tool invocations to the build variables 
 SECONDARY_FLASH += \
 CH32V003F4P6_Bootloader.bin \
-CH32V003F4P6_Bootloader.hex \
 
 SECONDARY_LIST += \
 CH32V003F4P6_Bootloader.lst \
@@ -56,7 +55,7 @@ all:
 main-build: CH32V003F4P6_Bootloader.elf secondary-outputs
 
 post-build: 
-	python ../Post_Build/add_crc32_end.py CH32V003F4P6_Bootloader.bin CH32V003F4P6_Bootloader_CRC.bin CH32V003F4P6_Bootloader_CRC.hex
+	python ../Post_Build/add_crc32_end.py CH32V003F4P6_Bootloader.bin CH32V003F4P6_Bootloader_CRC.bin
 
 # Tool invocations
 CH32V003F4P6_Bootloader.elf: $(OBJS) $(USER_OBJS)
@@ -68,11 +67,6 @@ CH32V003F4P6_Bootloader.elf: $(OBJS) $(USER_OBJS)
 CH32V003F4P6_Bootloader.bin: CH32V003F4P6_Bootloader.elf
 	@echo 'Invoking: GNU RISC-V Cross Create Flash Image'
 	@	riscv-none-embed-objcopy -O binary "CH32V003F4P6_Bootloader.elf" "CH32V003F4P6_Bootloader.bin"
-	@echo 'Finished building $@'
-	@
-CH32V003F4P6_Bootloader.hex: CH32V003F4P6_Bootloader.elf
-	@echo 'Invoking: GNU RISC-V Cross Create Flash Image'
-	@	riscv-none-embed-objcopy -O ihex "CH32V003F4P6_Bootloader.elf" "CH32V003F4P6_Bootloader.hex"
 	@echo 'Finished building $@'
 	@
 CH32V003F4P6_Bootloader.lst: CH32V003F4P6_Bootloader.elf

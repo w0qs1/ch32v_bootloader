@@ -6,8 +6,9 @@ PROVIDE( _stack_size = __stack_size );
 
 MEMORY
 {
-	FLASH_BOOT (rx) : ORIGIN = 0x00000000, LENGTH = 3K        /*User alloted space for bootloader. Must be > size of bootloader*/
-  FLASH_APPL (rx) : ORIGIN = 0x00000000 + 3K, LENGTH = 13K  /*Start of application code*/
+	FLASH_BOOT (rx) : ORIGIN = 0x00000000, LENGTH = 3K          /*User alloted space for bootloader. Must be >= size of bootloader*/
+  FLASH_APPL (rx) : ORIGIN = 0x00000C00, LENGTH = 3K - 64     /*Start of application code*/
+  FLASH_CNFG (rx) : ORIGIN = 0x00003FC0, LENGTH = 64          /*Location of boot configuration*/
 	RAM (xrw)  : ORIGIN = 0x20000000, LENGTH = 2K
 }
 
@@ -47,6 +48,14 @@ SECTIONS
       *(.text.handle_reset)
       *(.rodata.bootloader)
     } >FLASH_BOOT AT>FLASH_BOOT
+
+    /*To store the length of the file*/
+    .bootcfg :
+    {
+      . = ALIGN(4);
+      FW_LEN = .;
+      LONG(_etext)
+    } >FLASH_CNFG AT>FLASH_CNFG
     
     /*Application code and rodata*/
     .text :

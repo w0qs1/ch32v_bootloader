@@ -138,12 +138,21 @@ post_start:
     .if FW_CHECK
     la a0, msg2     // Firmware Check Enabled
     jal ra, print_uart
+
     la a0, FW_BASE
-    la a1, FW_END
+    la a1, FW_LEN
+    lw a1, 0(a1)
+    li t1, 0x3F
+    not t1, t1
+    and a2, a1, t1
+    bge a2, a1, next
+    addi a1, a2, 64
+next:
     // Compute CRC32
     jal ra, compute_crc
 
-    lw t0, CRC_LOC
+    la t0, CRC_LOC
+    lw t0, 0(t0)
     beq a0, t0, fw_correct1
     .else
     la a0, msg3     // No firmware Check Enabled
@@ -162,7 +171,8 @@ inf_loop:
 
 // Redundant check to ensure that the beq instruction itself is not corrupted
 fw_correct1:
-    lw t0, CRC_LOC
+    li t0, CRC_LOC
+    lw t0, 0(t0)
     beq a0, t0, fw_correct
 
 fw_correct:
@@ -443,3 +453,9 @@ msg4: .asciz "Firmware corrupted!\n"
 .align 4
 msg5: .asciz "Firmware OK..\n"
 .endif
+
+// .section .rodata.bootcfg, "a", @progbits
+// .align 4
+// .if FW_CHECK
+// FW_LEN: .word _etext
+// .endif

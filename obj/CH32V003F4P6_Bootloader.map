@@ -970,7 +970,8 @@ Memory Configuration
 
 Name             Origin             Length             Attributes
 FLASH_BOOT       0x0000000000000000 0x0000000000000c00 xr
-FLASH_APPL       0x0000000000000c00 0x0000000000003400 xr
+FLASH_APPL       0x0000000000000c00 0x0000000000000bc0 xr
+FLASH_CNFG       0x0000000000003fc0 0x0000000000000040 xr
 RAM              0x0000000020000000 0x0000000000000800 xrw
 *default*        0x0000000000000000 0xffffffffffffffff
 
@@ -1042,35 +1043,40 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_highcode_vma_end = .)
 
-.bootloader     0x00000000000000a0      0x59c
+.bootloader     0x00000000000000a0      0x5ec
                 0x00000000000000a0                . = ALIGN (0x4)
  *(.text.bootloader)
  .text.bootloader
-                0x00000000000000a0      0x24a ./Startup/custom_boot.o
+                0x00000000000000a0      0x268 ./Startup/custom_boot.o
                 0x00000000000000a0                custom_boot
-                0x0000000000000106                print_uart
-                0x0000000000000150                uart_putc
-                0x0000000000000178                uart_getc
-                0x000000000000022e                gpio_init
-                0x0000000000000274                gpio_check
-                0x000000000000028c                read_flash
-                0x00000000000002a8                compute_crc
+                0x0000000000000124                print_uart
+                0x000000000000016e                uart_putc
+                0x0000000000000196                uart_getc
+                0x000000000000024c                gpio_init
+                0x0000000000000292                gpio_check
+                0x00000000000002aa                read_flash
+                0x00000000000002c6                compute_crc
  .text.bootloader
-                0x00000000000002ea      0x1aa ./Startup/fw_upgrade.o
-                0x00000000000002ea                handle_fw_upgrade
+                0x0000000000000308      0x1ce ./Startup/fw_upgrade.o
+                0x0000000000000308                handle_fw_upgrade
  *(.text.handle_reset)
  .text.handle_reset
-                0x0000000000000494       0xbc ./Startup/startup_ch32v00x.o
-                0x0000000000000494                handle_reset
+                0x00000000000004d6       0xbc ./Startup/startup_ch32v00x.o
+                0x00000000000004d6                handle_reset
  *(.rodata.bootloader)
- *fill*         0x0000000000000550        0x0 
+ *fill*         0x0000000000000592        0xe 
  .rodata.bootloader
-                0x0000000000000550       0x8f ./Startup/custom_boot.o
- *fill*         0x00000000000005df        0x1 
+                0x00000000000005a0       0x8f ./Startup/custom_boot.o
+ *fill*         0x000000000000062f        0x1 
  .rodata.bootloader
-                0x00000000000005e0       0x5c ./Startup/fw_upgrade.o
-                0x00000000000005f8                fw_msg_1
-                0x000000000000061c                fw_msg_2
+                0x0000000000000630       0x5c ./Startup/fw_upgrade.o
+                0x0000000000000648                fw_msg_1
+                0x000000000000066c                fw_msg_2
+
+.bootcfg        0x0000000000003fc0        0x4
+                0x0000000000003fc0                . = ALIGN (0x4)
+                0x0000000000003fc0                FW_LEN = .
+                0x0000000000003fc0        0x4 LONG 0xec8 _etext
 
 .text           0x0000000000000c00      0x2c8
                 0x0000000000000c00                . = ALIGN (0x4)
@@ -1235,25 +1241,25 @@ END GROUP
                 0x0000000020000800                PROVIDE (_eusrstack = .)
 OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
 
-.debug_info     0x0000000000000000     0x4a33
+.debug_info     0x0000000000000000     0x4a6b
  .debug_info    0x0000000000000000      0xbc0 ./User/ch32v00x_it.o
  .debug_info    0x0000000000000bc0       0x43 ./User/main.o
  .debug_info    0x0000000000000c03      0xc94 ./User/system_ch32v00x.o
  .debug_info    0x0000000000001897       0x26 ./Startup/custom_boot.o
- .debug_info    0x00000000000018bd      0xc47 ./Startup/fw_upgrade.o
- .debug_info    0x0000000000002504       0x22 ./Startup/startup_ch32v00x.o
- .debug_info    0x0000000000002526     0x1481 ./Peripheral/src/ch32v00x_flash.o
- .debug_info    0x00000000000039a7     0x108c ./Peripheral/src/ch32v00x_rcc.o
+ .debug_info    0x00000000000018bd      0xc7f ./Startup/fw_upgrade.o
+ .debug_info    0x000000000000253c       0x22 ./Startup/startup_ch32v00x.o
+ .debug_info    0x000000000000255e     0x1481 ./Peripheral/src/ch32v00x_flash.o
+ .debug_info    0x00000000000039df     0x108c ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_abbrev   0x0000000000000000      0xf7f
+.debug_abbrev   0x0000000000000000      0xf78
  .debug_abbrev  0x0000000000000000      0x22c ./User/ch32v00x_it.o
  .debug_abbrev  0x000000000000022c       0x3b ./User/main.o
  .debug_abbrev  0x0000000000000267      0x2ee ./User/system_ch32v00x.o
  .debug_abbrev  0x0000000000000555       0x14 ./Startup/custom_boot.o
- .debug_abbrev  0x0000000000000569      0x281 ./Startup/fw_upgrade.o
- .debug_abbrev  0x00000000000007ea       0x12 ./Startup/startup_ch32v00x.o
- .debug_abbrev  0x00000000000007fc      0x3fa ./Peripheral/src/ch32v00x_flash.o
- .debug_abbrev  0x0000000000000bf6      0x389 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_abbrev  0x0000000000000569      0x27a ./Startup/fw_upgrade.o
+ .debug_abbrev  0x00000000000007e3       0x12 ./Startup/startup_ch32v00x.o
+ .debug_abbrev  0x00000000000007f5      0x3fa ./Peripheral/src/ch32v00x_flash.o
+ .debug_abbrev  0x0000000000000bef      0x389 ./Peripheral/src/ch32v00x_rcc.o
 
 .debug_aranges  0x0000000000000000      0x2d0
  .debug_aranges
@@ -1273,26 +1279,26 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_aranges
                 0x00000000000001f0       0xe0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_ranges   0x0000000000000000      0x2c8
+.debug_ranges   0x0000000000000000      0x2d0
  .debug_ranges  0x0000000000000000       0x18 ./User/ch32v00x_it.o
  .debug_ranges  0x0000000000000018       0x10 ./User/main.o
  .debug_ranges  0x0000000000000028       0x50 ./User/system_ch32v00x.o
- .debug_ranges  0x0000000000000078       0x58 ./Startup/fw_upgrade.o
- .debug_ranges  0x00000000000000d0       0x28 ./Startup/startup_ch32v00x.o
- .debug_ranges  0x00000000000000f8      0x100 ./Peripheral/src/ch32v00x_flash.o
- .debug_ranges  0x00000000000001f8       0xd0 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_ranges  0x0000000000000078       0x60 ./Startup/fw_upgrade.o
+ .debug_ranges  0x00000000000000d8       0x28 ./Startup/startup_ch32v00x.o
+ .debug_ranges  0x0000000000000100      0x100 ./Peripheral/src/ch32v00x_flash.o
+ .debug_ranges  0x0000000000000200       0xd0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_line     0x0000000000000000     0x43e3
+.debug_line     0x0000000000000000     0x44bf
  .debug_line    0x0000000000000000      0x346 ./User/ch32v00x_it.o
  .debug_line    0x0000000000000346       0x4a ./User/main.o
  .debug_line    0x0000000000000390      0x785 ./User/system_ch32v00x.o
- .debug_line    0x0000000000000b15      0x43a ./Startup/custom_boot.o
- .debug_line    0x0000000000000f4f      0x7b5 ./Startup/fw_upgrade.o
- .debug_line    0x0000000000001704      0x14e ./Startup/startup_ch32v00x.o
- .debug_line    0x0000000000001852     0x1cde ./Peripheral/src/ch32v00x_flash.o
- .debug_line    0x0000000000003530      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_line    0x0000000000000b15      0x46a ./Startup/custom_boot.o
+ .debug_line    0x0000000000000f7f      0x861 ./Startup/fw_upgrade.o
+ .debug_line    0x00000000000017e0      0x14e ./Startup/startup_ch32v00x.o
+ .debug_line    0x000000000000192e     0x1cde ./Peripheral/src/ch32v00x_flash.o
+ .debug_line    0x000000000000360c      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_str      0x0000000000000000     0x102e
+.debug_str      0x0000000000000000     0x103b
  .debug_str     0x0000000000000000      0x637 ./User/ch32v00x_it.o
                                         0x6a0 (size before relaxing)
  .debug_str     0x0000000000000637       0x14 ./User/main.o
@@ -1301,13 +1307,13 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
                                         0x763 (size before relaxing)
  .debug_str     0x00000000000007bd       0x25 ./Startup/custom_boot.o
                                          0x6a (size before relaxing)
- .debug_str     0x00000000000007e2       0xfc ./Startup/fw_upgrade.o
-                                        0x6ab (size before relaxing)
- .debug_str     0x00000000000008de       0x1e ./Startup/startup_ch32v00x.o
+ .debug_str     0x00000000000007e2      0x109 ./Startup/fw_upgrade.o
+                                        0x6b8 (size before relaxing)
+ .debug_str     0x00000000000008eb       0x1e ./Startup/startup_ch32v00x.o
                                          0x6f (size before relaxing)
- .debug_str     0x00000000000008fc      0x43d ./Peripheral/src/ch32v00x_flash.o
+ .debug_str     0x0000000000000909      0x43d ./Peripheral/src/ch32v00x_flash.o
                                         0xad0 (size before relaxing)
- .debug_str     0x0000000000000d39      0x2f5 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_str     0x0000000000000d46      0x2f5 ./Peripheral/src/ch32v00x_rcc.o
                                         0x9cc (size before relaxing)
 
 .comment        0x0000000000000000       0x33

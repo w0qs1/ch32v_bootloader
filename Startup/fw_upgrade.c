@@ -34,7 +34,7 @@ void handle_fw_upgrade(void) {
     volatile uint32_t *page_start;
     volatile uint32_t page_in_mem[64];
     volatile uint32_t buf[16];
-    volatile uint32_t temp;
+    volatile uint32_t crc_checksum, temp;
 
     gpio_init();
     fw_button = gpio_check();
@@ -124,22 +124,30 @@ void handle_fw_upgrade(void) {
                     break;
                 }
 
-                // Get data (64B) in big endian
-                for(uint8_t i = 0; i < 16; i++) {
+                // Get data (64B) and CRC32 checksum in big endian
+                for(uint8_t i = 0; i < 17; i++) {
+                    if(i == 16) {
+                        uart_rx = uart_getc();
+                        crc_checksum = crc_checksum << 8;
+                        crc_checksum |= uart_rx & 0xFF;
+                        break;
+                    }
+
                     for(uint8_t j = 0; j < 4; j++) {
                         uart_rx = uart_getc();
                         buf[i] = buf[i] << 8;
                         buf[i] |= uart_rx & 0xFF;
                     }
-                    // buf[i] = ((uart_getc() & 0xFF) << 24);
-                    // buf[i] |= ((uart_getc() & 0xFF) << 16);
-                    // buf[i] |= ((uart_getc() & 0xFF) << 8);
-                    // buf[i] |= uart_getc() & 0xFF;
-                    
                 }
 
-                uart_rx = FLASH_ROM_WRITE(0x08000000 + ((temp & 0xFF) * 64), (uint32_t *) buf, 64);
-                uart_putc(uart_rx);
+                temp = compute_crc(buf, 64);
+
+                if(temp == crc_checksum) {
+                    FLASH_ROM_WRITE(0x08000000 + ((temp & 0xFF) * 64), (uint32_t *) buf, 64);
+                    uart_putc(ACK);
+                } else {
+                    uart_putc(NACK);
+                }
                 break;
 
             case EXIT:
