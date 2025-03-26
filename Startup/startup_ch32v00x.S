@@ -173,8 +173,23 @@ handle_reset:
     ori t0, t0, 3
     csrw mtvec, t0
   
-    jal   SystemInit
-    la t0, main
-    csrw mepc, t0
-    mret
+    // jal   SystemInit
+    // la t0, main
+    // csrw mepc, t0
+    // mret
 
+    // Get SystemInit Location
+    li t0, 0x08003FC4
+    lw t0, 0(t0)
+    jalr t0
+
+    // Get Main location
+    li t0, 0x08003FC8
+    lw t0, 0(t0)
+    jalr t0
+    // csrw mepc, t0
+    // mret
+
+    // Dummy function that won't get called. Included just so that the compiler will include main and SystemInit
+    jal SystemInit
+    jal main

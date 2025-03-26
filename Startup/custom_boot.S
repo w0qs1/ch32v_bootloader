@@ -43,93 +43,6 @@ custom_boot:
     call handle_fw_upgrade
 .endif
 
-// .if FW_UPGDE
-//     jal ra, gpio_init
-//     jal ra, gpio_check
-//     bne a0, zero, post_start
-
-//     // Get firmware from UART
-//     la a0, msg6     // Print "Entering Firmware Upgrade mode.."
-//     jal ra, print_uart
-
-// get_cmd:
-//     jal ra, uart_getc
-//     addi s1, zero, CMD_FLASH_UNLOCK
-//     beq a0, s1, ACT_FLASH_UNLOCK
-
-//     addi s1, zero, CMD_FLASH_LOCK
-//     beq a0, s1, ACT_FLASH_LOCK
-
-//     addi s1, zero, CMD_FLASH_PR
-//     beq a0, s1, ACT_FLASH_PR
-
-//     addi s1, zero, CMD_FLASH_PE
-//     beq a0, s1, ACT_FLASH_PE
-
-//     addi s1, zero, CMD_FLASH_EA
-//     beq a0, s1, ACT_FLASH_EA
-
-//     addi s1, zero, CMD_FLASH_WH
-//     beq a0, s1, ACT_FLASH_WH
-
-//     beq x0, x0, get_cmd
-    
-// ACT_FLASH_UNLOCK:
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-
-//     call FLASH_Unlock
-
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-
-//     beq x0, x0, get_cmd
-
-// ACT_FLASH_LOCK:
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-
-//     call FLASH_Lock
-    
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-
-//     beq x0, x0, get_cmd
-
-// CMD_FLASH_PR:
-//     jal ra, uart_getc
-//     call FLASH_ErasePage
-
-// ACT_FLASH_PR:
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-
-//     jal ra, uart_getc
-//     add s1, zero, zero
-//     add s1, s1, a0
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-
-//     jal ra, uart_getc
-//     slli a0, a0, 8
-//     add s1, s1, a0
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-    
-//     jal ra, uart_getc
-//     slli a0, a0, 16
-//     add s1, s1, a0
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-    
-//     jal ra, uart_getc
-//     slli a0, a0, 24
-//     add s1, s1, a0
-//     addi a0, zero, ACK
-//     jal ra, uart_putc
-
-// .endif
-
 post_start:
     // Check for GPIO here
     la a0, msg1     // Print "POST Starting.."
@@ -151,9 +64,9 @@ next:
     // Compute CRC32
     jal ra, compute_crc
 
-    la t0, CRC_LOC
-    lw t0, 0(t0)
-    beq a0, t0, fw_correct1
+    li t0, CRC_LOC
+    lw t1, 0(t0)
+    beq a0, t1, fw_correct1
     .else
     la a0, msg3     // No firmware Check Enabled
     jal ra, print_uart

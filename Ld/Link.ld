@@ -48,14 +48,6 @@ SECTIONS
       *(.text.handle_reset)
       *(.rodata.bootloader)
     } >FLASH_BOOT AT>FLASH_BOOT
-
-    /*To store the length of the file*/
-    .bootcfg :
-    {
-      . = ALIGN(4);
-      FW_LEN = .;
-      LONG(_etext)
-    } >FLASH_CNFG AT>FLASH_CNFG
     
     /*Application code and rodata*/
     .text :
@@ -68,6 +60,16 @@ SECTIONS
       *(.gnu.linkonce.t.*)
       . = ALIGN(4);
     } >FLASH_APPL AT>FLASH_APPL 
+
+    /*To store the length of the file*/
+    .bootcfg :
+    {
+      . = ALIGN(4);
+      FW_LEN = .;
+      LONG(_etext)
+      LONG(SystemInit)
+      LONG(main)
+    } >FLASH_CNFG AT>FLASH_CNFG
 
     .fini :
     {

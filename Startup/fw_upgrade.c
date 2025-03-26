@@ -18,7 +18,9 @@ extern void read_flash(volatile uint32_t *, volatile uint32_t *, volatile uint32
 #define CMD_FLASH_PR        0x05
 #define CMD_FLASH_PE        0x06
 #define CMD_FLASH_PW        0x07
-#define CONTINUE            0x08
+#define CMD_SET_MAIN        0x08
+#define CMD_SET_SINI        0x09
+#define CMD_FLASH_CRC       0x0A
 #define EXIT                0xFF
 
 __attribute__((section(".rodata.bootloader")))
@@ -150,6 +152,14 @@ void handle_fw_upgrade(void) {
                 } else {
                     uart_putc(NACK);
                 }
+                break;
+
+            case CMD_SET_MAIN:
+                break;
+            case CMD_SET_SINI:
+                break;
+            case CMD_FLASH_CRC:
+                // To recompute and store the CRC after application modification
                 break;
 
             case EXIT:
