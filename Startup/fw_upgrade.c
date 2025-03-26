@@ -34,7 +34,7 @@ void handle_fw_upgrade(void) {
     volatile uint32_t *page_start;
     volatile uint32_t page_in_mem[64];
     volatile uint32_t buf[16];
-    volatile uint32_t crc_checksum, temp;
+    volatile uint32_t crc_checksum, temp, page_address;
 
     gpio_init();
     fw_button = gpio_check();
@@ -116,10 +116,10 @@ void handle_fw_upgrade(void) {
 
             case CMD_FLASH_PW:
                 // Get page address
-                temp = uart_getc();
+                page_address = uart_getc();
 
                 // Trying to write bootloader or location out of flash
-                if (temp < 0x30 || temp > 0xFF) {
+                if (page_address < 0x30 || page_address > 0xFF) {
                     uart_putc(NACK);
                     break;
                 }
@@ -127,9 +127,11 @@ void handle_fw_upgrade(void) {
                 // Get data (64B) and CRC32 checksum in big endian
                 for(uint8_t i = 0; i < 17; i++) {
                     if(i == 16) {
-                        uart_rx = uart_getc();
-                        crc_checksum = crc_checksum << 8;
-                        crc_checksum |= uart_rx & 0xFF;
+                        for(uint8_t j = 0; j < 4; j++) {
+                            uart_rx = uart_getc();
+                            crc_checksum = crc_checksum << 8;
+                            crc_checksum |= uart_rx & 0xFF;
+                        }
                         break;
                     }
 
@@ -143,7 +145,7 @@ void handle_fw_upgrade(void) {
                 temp = compute_crc(buf, 64);
 
                 if(temp == crc_checksum) {
-                    FLASH_ROM_WRITE(0x08000000 + ((temp & 0xFF) * 64), (uint32_t *) buf, 64);
+                    FLASH_ROM_WRITE(0x08000000 + ((page_address & 0xFF) * 64), (uint32_t *) buf, 64);
                     uart_putc(ACK);
                 } else {
                     uart_putc(NACK);
