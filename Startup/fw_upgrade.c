@@ -18,9 +18,9 @@ extern void read_flash(volatile uint32_t *, volatile uint32_t *, volatile uint32
 #define CMD_FLASH_PR        0x05
 #define CMD_FLASH_PE        0x06
 #define CMD_FLASH_PW        0x07
-#define CMD_SET_MAIN        0x08
-#define CMD_SET_SINI        0x09
-#define CMD_FLASH_CRC       0x0A
+// #define CMD_SET_SINI        0x08
+// #define CMD_SET_MAIN        0x09
+// #define CMD_FLASH_CRC       0x0A
 #define EXIT                0xFF
 
 __attribute__((section(".rodata.bootloader")))
@@ -154,18 +154,53 @@ void handle_fw_upgrade(void) {
                 }
                 break;
 
-            case CMD_SET_MAIN:
-                break;
-            case CMD_SET_SINI:
-                break;
-            case CMD_FLASH_CRC:
-                // To recompute and store the CRC after application modification
-                break;
+            // case CMD_SET_SINI:
+            //     // To set the location of SystemInit function in flash
+            //     for(uint8_t i = 0; i < 4; i++) {
+            //         temp = temp << 8;
+            //         uart_rx = uart_getc();
+            //         temp |= uart_rx & 0xFF;
+            //     }
+
+            //     // Copy last page to memory
+            //     page_start = (uint32_t *) 0x08003FC0;
+
+            //     read_flash(page_start, page_in_mem, page_start + 16);
+
+            //     page_in_mem[1] = temp;
+
+            //     // Fix the address issue
+            //     FLASH_ErasePage_Fast(0x08003FC0);
+            //     FLASH_ROM_WRITE(0x08003FC0, (uint32_t *) page_in_mem, 64);
+
+            //     // Write location of SystemInit into 0x08003FC4
+            //     // uart_rx = FLASH_ProgramWord(0x08003FC4, temp);
+            //     uart_putc(uart_rx);
+            //     break;
+
+            // case CMD_SET_MAIN:
+            //     // To set the location of main function in flash
+            //     for(uint8_t i = 0; i < 4; i++) {
+            //         temp = temp << 8;
+            //         uart_rx = uart_getc();
+            //         temp |= uart_rx & 0xFF;
+            //     }
+
+            //     // Write location of main into 0x08003FC8
+            //     FLASH_ProgramWord(0x08003FC8, temp);
+            //     uart_putc(ACK);
+            //     break;
+
+            // case CMD_FLASH_CRC:
+            //     // To recompute and store the CRC after application modification
+            //     break;
 
             case EXIT:
-            default:
                 print_uart(fw_msg_2);
                 return;
+            default:
+                uart_putc(NACK);
+                continue;
         }
     }
 
