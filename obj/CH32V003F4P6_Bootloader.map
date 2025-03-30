@@ -1075,34 +1075,34 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_highcode_vma_end = .)
 
-.bootloader     0x00000000000000a0      0x5ff
+.bootloader     0x00000000000000a0      0x6af
                 0x00000000000000a0                . = ALIGN (0x4)
  *(.text.bootloader)
  .text.bootloader
-                0x00000000000000a0      0x318 ./Startup/custom_boot.o
+                0x00000000000000a0      0x3c8 ./Startup/custom_boot.o
                 0x00000000000000a0                fw_upgrade
-                0x000000000000014e                custom_boot
-                0x00000000000001d4                print_uart
-                0x000000000000021e                uart_putc
-                0x0000000000000246                uart_getc
-                0x00000000000002fc                gpio_init
-                0x0000000000000342                gpio_check
-                0x000000000000035a                read_flash
-                0x0000000000000376                compute_crc
+                0x00000000000001fe                custom_boot
+                0x0000000000000284                print_uart
+                0x00000000000002ce                uart_putc
+                0x00000000000002f6                uart_getc
+                0x00000000000003ac                gpio_init
+                0x00000000000003f2                gpio_check
+                0x000000000000040a                read_flash
+                0x0000000000000426                compute_crc
  .text.bootloader
-                0x00000000000003b8      0x12a ./Startup/flash_commands.o
-                0x00000000000003b8                flash_cmd_unlock
-                0x00000000000003f4                flash_cmd_lock
-                0x0000000000000416                flash_cmd_erasepage
-                0x0000000000000462                flash_cmd_writepage
+                0x0000000000000468      0x12a ./Startup/flash_commands.o
+                0x0000000000000468                flash_cmd_unlock
+                0x00000000000004a4                flash_cmd_lock
+                0x00000000000004c6                flash_cmd_erasepage
+                0x0000000000000512                flash_cmd_writepage
  *(.text.handle_reset)
  .text.handle_reset
-                0x00000000000004e2       0xcc ./Startup/startup_ch32v00x.o
-                0x00000000000004e2                handle_reset
+                0x0000000000000592       0xcc ./Startup/startup_ch32v00x.o
+                0x0000000000000592                handle_reset
  *(.rodata.bootloader)
- *fill*         0x00000000000005ae        0x2 
+ *fill*         0x000000000000065e        0x2 
  .rodata.bootloader
-                0x00000000000005b0       0xef ./Startup/custom_boot.o
+                0x0000000000000660       0xef ./Startup/custom_boot.o
 
 .text           0x0000000000000c00      0x1f4
                 0x0000000000000c00                . = ALIGN (0x4)
@@ -1224,36 +1224,38 @@ END GROUP
                 0x0000000000000df4                . = ALIGN (0x4)
                 0x0000000000000df4                PROVIDE (_data_lma = .)
 
-.data           0x0000000020000000        0x0 load address 0x0000000000000df4
+.data           0x0000000020000000       0x40 load address 0x0000000000000df4
                 0x0000000020000000                . = ALIGN (0x4)
  *(.gnu.linkonce.r.*)
  *(.data .data.*)
+ .data.bootloader
+                0x0000000020000000       0x40 ./Startup/custom_boot.o
  *(.gnu.linkonce.d.*)
-                0x0000000020000000                . = ALIGN (0x8)
-                0x0000000020000800                PROVIDE (__global_pointer$ = (. + 0x800))
+                0x0000000020000040                . = ALIGN (0x8)
+                0x0000000020000840                PROVIDE (__global_pointer$ = (. + 0x800))
  *(.sdata .sdata.*)
  *(.sdata2*)
  *(.gnu.linkonce.s.*)
-                0x0000000020000000                . = ALIGN (0x8)
+                0x0000000020000040                . = ALIGN (0x8)
  *(.srodata.cst16)
  *(.srodata.cst8)
  *(.srodata.cst4)
  *(.srodata.cst2)
  *(.srodata .srodata.*)
-                0x0000000020000000                . = ALIGN (0x4)
-                0x0000000020000000                PROVIDE (_edata = .)
+                0x0000000020000040                . = ALIGN (0x4)
+                0x0000000020000040                PROVIDE (_edata = .)
 
-.bss            0x0000000020000000        0x0 load address 0x0000000000000df4
-                0x0000000020000000                . = ALIGN (0x4)
-                0x0000000020000000                PROVIDE (_sbss = .)
+.bss            0x0000000020000040        0x0 load address 0x0000000000000e34
+                0x0000000020000040                . = ALIGN (0x4)
+                0x0000000020000040                PROVIDE (_sbss = .)
  *(.sbss*)
  *(.gnu.linkonce.sb.*)
  *(.bss*)
  *(.gnu.linkonce.b.*)
  *(COMMON*)
-                0x0000000020000000                . = ALIGN (0x4)
-                0x0000000020000000                PROVIDE (_ebss = .)
-                0x0000000020000000                PROVIDE (_end = _ebss)
+                0x0000000020000040                . = ALIGN (0x4)
+                0x0000000020000040                PROVIDE (_ebss = .)
+                0x0000000020000040                PROVIDE (_end = _ebss)
                 [!provide]                        PROVIDE (end = .)
 
 .stack          0x0000000020000700      0x100
@@ -1306,14 +1308,14 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_ranges  0x00000000000000c8       0x28 ./Startup/startup_ch32v00x.o
  .debug_ranges  0x00000000000000f0       0xd0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_line     0x0000000000000000     0x25ae
+.debug_line     0x0000000000000000     0x26da
  .debug_line    0x0000000000000000      0x346 ./User/ch32v00x_it.o
  .debug_line    0x0000000000000346      0x30e ./User/main.o
  .debug_line    0x0000000000000654      0x785 ./User/system_ch32v00x.o
- .debug_line    0x0000000000000dd9      0x5ae ./Startup/custom_boot.o
- .debug_line    0x0000000000001387      0x20e ./Startup/flash_commands.o
- .debug_line    0x0000000000001595      0x166 ./Startup/startup_ch32v00x.o
- .debug_line    0x00000000000016fb      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_line    0x0000000000000dd9      0x6da ./Startup/custom_boot.o
+ .debug_line    0x00000000000014b3      0x20e ./Startup/flash_commands.o
+ .debug_line    0x00000000000016c1      0x166 ./Startup/startup_ch32v00x.o
+ .debug_line    0x0000000000001827      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
 
 .debug_str      0x0000000000000000      0xb79
  .debug_str     0x0000000000000000      0x637 ./User/ch32v00x_it.o
