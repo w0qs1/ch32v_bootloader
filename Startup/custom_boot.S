@@ -1,27 +1,11 @@
-.section .text.bootloader, "ax"  // Executable code section
-.global custom_boot
-
 #include "boot_config.S"
 
 .ifdef FW_UPGDE
-.extern handle_fw_upgrade
+#include "fw_upgrade.S"
 .endif
-// .ifdef FW_UPGDE
-// .extern FLASH_Unlock
-// .extern FLASH_Lock
-// .extern FLASH_ErasePage
-// .extern FLASH_ProgramWord
 
-// .equ    NACK,               0x00
-// .equ    ACK,                0x01
-// .equ    PING,               0x02
-// .equ    CMD_FLASH_UNLOCK,   0x03
-// .equ    CMD_FLASH_LOCK,     0x04
-// .equ    CMD_FLASH_PR,       0x05
-// .equ    CMD_FLASH_PE,       0x06
-// .equ    CMD_FLASH_EA,       0x07
-// .equ    CMD_FLASH_WH,       0x08
-// .endif
+.section .text.bootloader, "ax"  // Executable code section
+.global custom_boot
 
 custom_boot:
     // Initialize UART
@@ -40,7 +24,7 @@ custom_boot:
     jal ra, uart_init
 
 .if FW_UPGDE
-    call handle_fw_upgrade
+    jal ra, fw_upgrade
 .endif
 
 post_start:
