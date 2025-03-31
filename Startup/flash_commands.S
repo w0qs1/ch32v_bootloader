@@ -58,7 +58,9 @@ flash_cmd_erasepage:
 
     // Set Page Erase Bit
     li t0, FLASH_CTRL
-    li t1, 0x00020000
+    lw t1, 0(t0)
+    li t2, 0x00020000
+    or t1, t1, t2
     sw t1, 0(t0)
 
     // Set Address
@@ -66,7 +68,9 @@ flash_cmd_erasepage:
     sw a0, 0(t2)
 
     // Set STRT bit
-    li t1, 0x00000040
+    lw t1, 0(t0)
+    li t2, 0x00000040
+    or t1, t1, t2
     sw t1, 0(t0)
 
     // Wait while flash is busy

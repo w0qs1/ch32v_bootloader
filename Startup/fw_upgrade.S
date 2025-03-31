@@ -14,6 +14,10 @@
 .equ    CMD_FLASH_CRC,      0x0A
 .equ    EXIT,               0xFF
 
+.extern FLASH_ErasePage_Fast
+.extern FLASH_Unlock_Fast
+.extern FLASH_Lock_Fast
+
 fw_upgrade:
     addi sp, sp, -4
     sw ra, 0(sp)
@@ -57,7 +61,7 @@ loop:
     beq a0, t1, cmd_flash_pe
     
     li t1, CMD_FLASH_PW
-    beq a0, t1, cmd_flash_pe
+    beq a0, t1, cmd_flash_pw
     
     li t1, CMD_SET_SINI
     beq a0, t1, cmd_set_sini
@@ -70,23 +74,29 @@ loop:
 
     beq a0, zero, return_to_caller
 
+// To check if firmware upgrading mode is responsive
 ping:
     li a0, ACK
     jal ra, uart_putc
     beq x0, x0, loop
 
+// To unlock the flash memory for erasing
 cmd_flash_unlock:
-    jal ra, flash_cmd_unlock
+    // jal ra, flash_cmd_unlock
+    jal ra, FLASH_Unlock_Fast
     li a0, ACK
     jal ra, uart_putc
     beq x0, x0, loop
 
+// To lock the flash memory
 cmd_flash_lock:
-    jal ra, flash_cmd_lock
+    // jal ra, flash_cmd_lock
+    jal ra, FLASH_Lock_Fast
     li a0, ACK
     jal ra, uart_putc
     beq x0, x0, loop
 
+// To read a page from flash, compute crc and print over uart
 cmd_flash_pr:
     // Get page address
     jal ra, uart_getc
@@ -108,11 +118,16 @@ cmd_flash_pr:
     la a1, page_in_mem
     addi a2, a0, 64
 
+    // call read_flash function that copies the flash
+    // memory into sram
     jal ra, read_flash
 
+// To print a memory array over uart
 print_mem_to_uart:
     la a1, page_in_mem
     li t0, 0x010
+
+    // print each word in little endian format
 1:    
     lw a2, 0(a1)
     andi a0, a2, 0x0FF
@@ -134,10 +149,12 @@ print_mem_to_uart:
     addi t0, t0, -1
     bne t0, zero, 1b
 
+    // compute crc of the page read
     mv a0, a3
     li a1, 64
     jal ra, compute_crc
 
+    // print the crc byte in little endian format
     mv a3, a0
     andi a0, a3, 0x0FF
     jal ra, uart_putc
@@ -153,19 +170,109 @@ print_mem_to_uart:
 
     beq x0, x0, loop
 
-fail:
-    li a0, NACK
+// To erase a page in flash memory
+cmd_flash_pe:
+    // Get page address
+    jal ra, uart_getc
+    mv a3, a0
+    
+    li t0, 0x030
+    li t1, 0x100
+    
+    blt a0, t0, fail
+    bge a0, t1, fail
+
+    li t1, 0x08000000
+    slli a4, a3, 6
+    add t1, t1, a4
+
+    mv a0, t1
+    // jal ra, flash_cmd_erasepage
+    jal ra, FLASH_ErasePage_Fast
+
+    li a0, ACK
     jal ra, uart_putc
     beq x0, x0, loop
 
-cmd_flash_pe:
-    jal ra, uart_getc
-    // Fill here
-    beq x0, x0, loop
-
 cmd_flash_pw:
+    // Get page address
     jal ra, uart_getc
-    // Fill here
+    mv a3, a0
+    
+    li t0, 0x030
+    li t1, 0x100
+    
+    blt a0, t0, fail
+    bge a0, t1, fail
+
+    addi sp, sp, -4
+    sw a3, 0(sp)
+
+    // Get 16 words (1 page)
+    la a2, page_in_mem
+    addi s1, a2, 64
+
+2:
+    jal ra, uart_getc
+    mv a3, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 8
+    or a3, a3, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 16
+    or a3, a3, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 24
+    or a3, a3, a0
+
+    sw a3, 0(a2)
+    addi a2, a2, 4
+    bne a2, s1, 2b
+
+    // Get the CRC checksum of the 16 words (little endian format)
+    jal ra, uart_getc
+    mv a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 8
+    or a2, a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 16
+    or a2, a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 24
+    or a2, a2, a0
+    mv s1, a2
+    
+    la a0, page_in_mem
+    li a1, 64
+
+    jal ra, compute_crc
+
+    bne a0, s1, fail
+
+    // Get page address
+    lw a3, 0(sp)
+    addi sp, sp, 4
+
+    // Compute page address
+    li t0, 0x08000000
+    slli a3, a3, 6
+    add a0, t0, a3
+
+    la a1, page_in_mem
+    li a2, 64
+
+    jal ra, FLASH_ROM_WRITE
+
+    li a0, ACK
+    jal ra, uart_putc
+
     beq x0, x0, loop
 
 cmd_set_sini:
@@ -181,6 +288,12 @@ cmd_set_main:
 cmd_flash_crc:
     jal ra, uart_getc
     // Fill here
+    beq x0, x0, loop
+
+// This is if the page range is outside the limits
+fail:
+    li a0, NACK
+    jal ra, uart_putc
     beq x0, x0, loop
 
 .section .rodata.bootloader, "a", @progbits

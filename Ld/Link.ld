@@ -46,6 +46,7 @@ SECTIONS
       . = ALIGN(4);
       *(.text.bootloader)
       *(.text.handle_reset)
+      *ch32v00x_flash.o(.text*)
       *(.rodata.bootloader)
     } >FLASH_BOOT AT>FLASH_BOOT
     
