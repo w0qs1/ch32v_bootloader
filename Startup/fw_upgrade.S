@@ -14,34 +14,43 @@
 .equ    CMD_FLASH_CRC,      0x0A
 .equ    EXIT,               0xFF
 
+// Functions from ch32v00x_flash.c
 .extern FLASH_ErasePage_Fast
 .extern FLASH_Unlock_Fast
 .extern FLASH_Lock_Fast
 
 fw_upgrade:
+    // save ra in stack
     addi sp, sp, -4
     sw ra, 0(sp)
+
+    // initialize and check for button press
     jal ra, gpio_init
     jal ra, gpio_check
 
     beq a0, zero, button_pressed
 
-    // If button is not pressed, return
+    // If button is not pressed, return without any msg
+    // also restores ra from stack
 return_to_caller_no_msg:
     lw ra, 0(sp)
     addi sp, sp, 4
     jalr x0, 0(ra)
 
+// return with a message
 return_to_caller:
     la a0, fw_msg_2
     jal ra, print_uart
     beq zero, zero, return_to_caller_no_msg
 
+// prints "Entering Firmware Upgrade Mode.."
 button_pressed:
     la a0, fw_msg_1
     jal ra, print_uart
 
+// while(1) loop for the handler
 loop:
+    // get a command byte
     jal ra, uart_getc
 
     // Switch case statement here
@@ -72,6 +81,7 @@ loop:
     li t1, CMD_FLASH_CRC
     beq a0, t1, cmd_flash_crc
 
+    // return if an incorrect command is supplied
     beq a0, zero, return_to_caller
 
 // To check if firmware upgrading mode is responsive
@@ -82,7 +92,6 @@ ping:
 
 // To unlock the flash memory for erasing
 cmd_flash_unlock:
-    // jal ra, flash_cmd_unlock
     jal ra, FLASH_Unlock_Fast
     li a0, ACK
     jal ra, uart_putc
@@ -90,7 +99,6 @@ cmd_flash_unlock:
 
 // To lock the flash memory
 cmd_flash_lock:
-    // jal ra, flash_cmd_lock
     jal ra, FLASH_Lock_Fast
     li a0, ACK
     jal ra, uart_putc
@@ -102,6 +110,7 @@ cmd_flash_pr:
     jal ra, uart_getc
     mv a3, a0
     
+    // check limits for the page
     li t0, 0x030
     li t1, 0x100
     
@@ -154,7 +163,7 @@ print_mem_to_uart:
     li a1, 64
     jal ra, compute_crc
 
-    // print the crc byte in little endian format
+    // print the crc word in little endian format
     mv a3, a0
     andi a0, a3, 0x0FF
     jal ra, uart_putc
@@ -176,6 +185,7 @@ cmd_flash_pe:
     jal ra, uart_getc
     mv a3, a0
     
+    // check limits for the page
     li t0, 0x030
     li t1, 0x100
     
@@ -187,18 +197,19 @@ cmd_flash_pe:
     add t1, t1, a4
 
     mv a0, t1
-    // jal ra, flash_cmd_erasepage
     jal ra, FLASH_ErasePage_Fast
 
     li a0, ACK
     jal ra, uart_putc
     beq x0, x0, loop
 
+// To write a page in flash memory
 cmd_flash_pw:
     // Get page address
     jal ra, uart_getc
     mv a3, a0
     
+    // check limits for the page
     li t0, 0x030
     li t1, 0x100
     
@@ -208,7 +219,7 @@ cmd_flash_pw:
     addi sp, sp, -4
     sw a3, 0(sp)
 
-    // Get 16 words (1 page)
+    // Get 16 words (1 page) and store it in SRAM
     la a2, page_in_mem
     addi s1, a2, 64
 
@@ -254,6 +265,7 @@ cmd_flash_pw:
 
     jal ra, compute_crc
 
+    // return if crc check fails
     bne a0, s1, fail
 
     // Get page address
@@ -265,6 +277,7 @@ cmd_flash_pw:
     slli a3, a3, 6
     add a0, t0, a3
 
+    // write the page to flash memory
     la a1, page_in_mem
     li a2, 64
 
@@ -275,16 +288,20 @@ cmd_flash_pw:
 
     beq x0, x0, loop
 
+// To set the location of SystemInit function
 cmd_set_sini:
     jal ra, uart_getc
-    // Fill here
+    
+    
     beq x0, x0, loop
 
+// To set the location of main function
 cmd_set_main:
     jal ra, uart_getc
     // Fill here
     beq x0, x0, loop
 
+// To recompute and store the crc in flash memory
 cmd_flash_crc:
     jal ra, uart_getc
     // Fill here
