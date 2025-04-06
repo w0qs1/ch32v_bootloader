@@ -277,6 +277,7 @@ cmd_flash_pw:
     slli a3, a3, 6
     add a0, t0, a3
 
+page_write_int:
     // write the page to flash memory
     la a1, page_in_mem
     li a2, 64
@@ -290,21 +291,119 @@ cmd_flash_pw:
 
 // To set the location of SystemInit function
 cmd_set_sini:
+    // Get the location of SystemInit function (4B)
     jal ra, uart_getc
-    
-    
-    beq x0, x0, loop
+    mv a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 8
+    or a2, a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 16
+    or a2, a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 24
+    or a2, a2, a0
+    mv s1, a2
+
+    // compute flash starting address
+    li a0, 0x08003FC0
+    la a1, page_in_mem
+    addi a2, a0, 64
+
+    // call read_flash function that copies the flash
+    // memory into sram
+    jal ra, read_flash
+
+    // Erase the page
+    li a0, 0x08003FC0
+    jal ra, FLASH_ErasePage_Fast
+
+    // store the location of SystemInit in memory
+    la a1, page_in_mem
+    sw s1, 4(a1)
+
+    // Write the page to FLASH
+    beq x0, x0, page_write_int
 
 // To set the location of main function
 cmd_set_main:
+    // Get the location of main function (4B)
     jal ra, uart_getc
-    // Fill here
-    beq x0, x0, loop
+    mv a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 8
+    or a2, a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 16
+    or a2, a2, a0
+
+    jal ra, uart_getc
+    slli a0, a0, 24
+    or a2, a2, a0
+    mv s1, a2
+
+    // compute flash starting address
+    li a0, 0x08003FC0
+    la a1, page_in_mem
+    addi a2, a0, 64
+
+    // call read_flash function that copies the flash
+    // memory into sram
+    jal ra, read_flash
+
+    // Erase the page
+    li a0, 0x08003FC0
+    jal ra, FLASH_ErasePage_Fast
+    
+    // store the location of SystemInit in memory
+    la a1, page_in_mem
+    sw s1, 8(a1)
+
+    // Write the page to FLASH
+    beq x0, x0, page_write_int
 
 // To recompute and store the crc in flash memory
 cmd_flash_crc:
-    jal ra, uart_getc
-    // Fill here
+    // compute flash starting address
+    li a0, 0x08003FC0
+    la a1, page_in_mem
+    addi a2, a0, 64
+
+    // call read_flash function that copies the flash
+    // memory into sram
+    jal ra, read_flash
+
+    la a0, FW_BASE
+    // get the end of text pointer
+    li t0, 0x08003FC0
+    lw a1, 0(t0)
+    li t1, 0x3F
+    not t1, t1
+    and a2, a1, t1
+    bge a2, a1, next
+    addi a1, a2, 64
+
+    jal ra, compute_crc
+
+    la a1, page_in_mem
+    sw a0, 60(a1)
+
+    // Erase the page
+    li a0, 0x08003FC0
+    jal ra, FLASH_ErasePage_Fast
+
+    la a1, page_in_mem
+    // Write the page to FLASH
+    beq x0, x0, page_write_int
+
+    la a0, ACK
+    jal ra, uart_putc
+
     beq x0, x0, loop
 
 // This is if the page range is outside the limits

@@ -89,6 +89,7 @@ _start:
 NMI_Handler:
 HardFault_Handler:
 SysTick_Handler:
+    li t0, 0x123
 SW_Handler:
 WWDG_IRQHandler:
 PVD_IRQHandler:
@@ -169,7 +170,9 @@ handle_reset:
     li t0, 0x3
     csrw 0x804, t0
 /* Configure the interrupt vector table recognition mode and entry address mode */
-    la t0, _start
+    // la t0, _start
+    // Change base address of the interrupt table to the start of application section
+    la t0, _text_start
     ori t0, t0, 3
     csrw mtvec, t0
   

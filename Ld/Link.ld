@@ -47,9 +47,18 @@ SECTIONS
       *(.text.bootloader)
       *(.text.handle_reset)
       *ch32v00x_flash.o(.text*)
+      *save-restore.o(.text*)
       *(.rodata.bootloader)
     } >FLASH_BOOT AT>FLASH_BOOT
-    
+
+    /* Application Vector Table at start of FLASH_APPL */
+    .vectors :
+    {
+      PROVIDE(_text_start = .);
+      KEEP(*(.text.vector_handler))          /* Your vector table section */
+      . = ALIGN(4);              /* Align to 4 bytes */
+    } > FLASH_APPL
+
     /*Application code and rodata*/
     .text :
     {
