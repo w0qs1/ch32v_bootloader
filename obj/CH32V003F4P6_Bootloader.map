@@ -1057,143 +1057,143 @@ END GROUP
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_highcode_vma_end = .)
 
-.bootloader     0x00000000000000a0      0x8cf
+.bootloader     0x00000000000000a0      0x915
                 0x00000000000000a0                . = ALIGN (0x4)
  *(.text.bootloader)
  .text.bootloader
-                0x00000000000000a0      0x5a2 ./Startup/custom_boot.o
+                0x00000000000000a0      0x5d6 ./Startup/custom_boot.o
                 0x00000000000000a0                fw_upgrade
-                0x00000000000003c8                custom_boot
-                0x000000000000045e                print_uart
-                0x00000000000004a8                uart_putc
-                0x00000000000004d0                uart_getc
-                0x0000000000000586                gpio_init
-                0x00000000000005cc                gpio_check
-                0x00000000000005e4                read_flash
-                0x0000000000000600                compute_crc
+                0x00000000000003dc                custom_boot
+                0x0000000000000492                print_uart
+                0x00000000000004dc                uart_putc
+                0x0000000000000504                uart_getc
+                0x00000000000005ba                gpio_init
+                0x0000000000000600                gpio_check
+                0x0000000000000618                read_flash
+                0x0000000000000634                compute_crc
  *(.text.handle_reset)
  .text.handle_reset
-                0x0000000000000642       0xcc ./Startup/startup_ch32v00x.o
-                0x0000000000000642                handle_reset
+                0x0000000000000676       0xcc ./Startup/startup_ch32v00x.o
+                0x0000000000000676                handle_reset
  *ch32v00x_flash.o(.text*)
  .text.FLASH_Unlock_Fast
-                0x000000000000070e       0x1e ./Peripheral/src/ch32v00x_flash.o
-                0x000000000000070e                FLASH_Unlock_Fast
+                0x0000000000000742       0x1e ./Peripheral/src/ch32v00x_flash.o
+                0x0000000000000742                FLASH_Unlock_Fast
  .text.FLASH_Lock_Fast
-                0x000000000000072c        0xe ./Peripheral/src/ch32v00x_flash.o
-                0x000000000000072c                FLASH_Lock_Fast
+                0x0000000000000760        0xe ./Peripheral/src/ch32v00x_flash.o
+                0x0000000000000760                FLASH_Lock_Fast
  .text.FLASH_ErasePage_Fast
-                0x000000000000073a       0x36 ./Peripheral/src/ch32v00x_flash.o
-                0x000000000000073a                FLASH_ErasePage_Fast
+                0x000000000000076e       0x36 ./Peripheral/src/ch32v00x_flash.o
+                0x000000000000076e                FLASH_ErasePage_Fast
  .text.FLASH_ROM_WRITE
-                0x0000000000000770       0xf6 ./Peripheral/src/ch32v00x_flash.o
-                0x0000000000000770                FLASH_ROM_WRITE
+                0x00000000000007a4       0xf6 ./Peripheral/src/ch32v00x_flash.o
+                0x00000000000007a4                FLASH_ROM_WRITE
  *save-restore.o(.text*)
- .text          0x0000000000000866       0x14 c:/mounriver/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/rv32ecxw/ilp32e\libgcc.a(save-restore.o)
-                0x0000000000000866                __riscv_save_1
-                0x0000000000000866                __riscv_save_2
-                0x0000000000000866                __riscv_save_0
-                0x0000000000000870                __riscv_restore_0
-                0x0000000000000870                __riscv_restore_1
-                0x0000000000000870                __riscv_restore_2
+ .text          0x000000000000089a       0x14 c:/mounriver/mounriver_studio2/resources/app/resources/win32/components/wch/toolchain/risc-v embedded gcc/bin/../lib/gcc/riscv-none-embed/8.2.0/rv32ecxw/ilp32e\libgcc.a(save-restore.o)
+                0x000000000000089a                __riscv_save_1
+                0x000000000000089a                __riscv_save_2
+                0x000000000000089a                __riscv_save_0
+                0x00000000000008a4                __riscv_restore_0
+                0x00000000000008a4                __riscv_restore_1
+                0x00000000000008a4                __riscv_restore_2
  *(.rodata.bootloader)
- *fill*         0x000000000000087a        0x6 
+ *fill*         0x00000000000008ae        0x2 
  .rodata.bootloader
-                0x0000000000000880       0xef ./Startup/custom_boot.o
+                0x00000000000008b0      0x105 ./Startup/custom_boot.o
 
-.vectors        0x0000000000000c00        0x8
+.vectors        0x0000000000000c00        0x4
                 0x0000000000000c00                PROVIDE (_text_start = .)
  *(.text.vector_handler)
  .text.vector_handler
-                0x0000000000000c00        0x6 ./Startup/startup_ch32v00x.o
+                0x0000000000000c00        0x2 ./Startup/startup_ch32v00x.o
+                0x0000000000000c00                TIM1_CC_IRQHandler
                 0x0000000000000c00                SysTick_Handler
-                0x0000000000000c04                TIM1_CC_IRQHandler
-                0x0000000000000c04                PVD_IRQHandler
-                0x0000000000000c04                SPI1_IRQHandler
-                0x0000000000000c04                AWU_IRQHandler
-                0x0000000000000c04                EXTI7_0_IRQHandler
-                0x0000000000000c04                DMA1_Channel4_IRQHandler
-                0x0000000000000c04                ADC1_IRQHandler
-                0x0000000000000c04                DMA1_Channel7_IRQHandler
-                0x0000000000000c04                I2C1_EV_IRQHandler
-                0x0000000000000c04                DMA1_Channel6_IRQHandler
-                0x0000000000000c04                RCC_IRQHandler
-                0x0000000000000c04                TIM1_TRG_COM_IRQHandler
-                0x0000000000000c04                DMA1_Channel1_IRQHandler
-                0x0000000000000c04                DMA1_Channel5_IRQHandler
-                0x0000000000000c04                DMA1_Channel3_IRQHandler
-                0x0000000000000c04                TIM1_UP_IRQHandler
-                0x0000000000000c04                WWDG_IRQHandler
-                0x0000000000000c04                TIM2_IRQHandler
-                0x0000000000000c04                SW_Handler
-                0x0000000000000c04                TIM1_BRK_IRQHandler
-                0x0000000000000c04                DMA1_Channel2_IRQHandler
-                0x0000000000000c04                FLASH_IRQHandler
-                0x0000000000000c04                USART1_IRQHandler
-                0x0000000000000c04                I2C1_ER_IRQHandler
-                0x0000000000000c08                . = ALIGN (0x4)
- *fill*         0x0000000000000c06        0x2 
+                0x0000000000000c00                PVD_IRQHandler
+                0x0000000000000c00                SPI1_IRQHandler
+                0x0000000000000c00                AWU_IRQHandler
+                0x0000000000000c00                EXTI7_0_IRQHandler
+                0x0000000000000c00                DMA1_Channel4_IRQHandler
+                0x0000000000000c00                ADC1_IRQHandler
+                0x0000000000000c00                DMA1_Channel7_IRQHandler
+                0x0000000000000c00                I2C1_EV_IRQHandler
+                0x0000000000000c00                DMA1_Channel6_IRQHandler
+                0x0000000000000c00                RCC_IRQHandler
+                0x0000000000000c00                TIM1_TRG_COM_IRQHandler
+                0x0000000000000c00                DMA1_Channel1_IRQHandler
+                0x0000000000000c00                DMA1_Channel5_IRQHandler
+                0x0000000000000c00                DMA1_Channel3_IRQHandler
+                0x0000000000000c00                TIM1_UP_IRQHandler
+                0x0000000000000c00                WWDG_IRQHandler
+                0x0000000000000c00                TIM2_IRQHandler
+                0x0000000000000c00                SW_Handler
+                0x0000000000000c00                TIM1_BRK_IRQHandler
+                0x0000000000000c00                DMA1_Channel2_IRQHandler
+                0x0000000000000c00                FLASH_IRQHandler
+                0x0000000000000c00                USART1_IRQHandler
+                0x0000000000000c00                I2C1_ER_IRQHandler
+                0x0000000000000c04                . = ALIGN (0x4)
+ *fill*         0x0000000000000c02        0x2 
 
-.text           0x0000000000000c08      0x1e0
-                0x0000000000000c08                . = ALIGN (0x4)
+.text           0x0000000000000c04      0x1e0
+                0x0000000000000c04                . = ALIGN (0x4)
  *(.text)
  *(.text.*)
  .text.NMI_Handler
-                0x0000000000000c08        0x2 ./User/ch32v00x_it.o
-                0x0000000000000c08                NMI_Handler
+                0x0000000000000c04        0x2 ./User/ch32v00x_it.o
+                0x0000000000000c04                NMI_Handler
  .text.HardFault_Handler
-                0x0000000000000c0a       0x10 ./User/ch32v00x_it.o
-                0x0000000000000c0a                HardFault_Handler
+                0x0000000000000c06       0x10 ./User/ch32v00x_it.o
+                0x0000000000000c06                HardFault_Handler
  .text.delay_ms
-                0x0000000000000c1a       0x2c ./User/main.o
-                0x0000000000000c1a                delay_ms
+                0x0000000000000c16       0x2c ./User/main.o
+                0x0000000000000c16                delay_ms
  .text.startup.main
-                0x0000000000000c46       0x5c ./User/main.o
-                0x0000000000000c46                main
+                0x0000000000000c42       0x5c ./User/main.o
+                0x0000000000000c42                main
  .text.SystemInit
-                0x0000000000000ca2      0x132 ./User/system_ch32v00x.o
-                0x0000000000000ca2                SystemInit
+                0x0000000000000c9e      0x132 ./User/system_ch32v00x.o
+                0x0000000000000c9e                SystemInit
  .text.RCC_AdjustHSICalibrationValue
-                0x0000000000000dd4       0x12 ./Peripheral/src/ch32v00x_rcc.o
-                0x0000000000000dd4                RCC_AdjustHSICalibrationValue
+                0x0000000000000dd0       0x12 ./Peripheral/src/ch32v00x_rcc.o
+                0x0000000000000dd0                RCC_AdjustHSICalibrationValue
  *(.rodata)
  *(.rodata*)
  *(.gnu.linkonce.t.*)
-                0x0000000000000de8                . = ALIGN (0x4)
- *fill*         0x0000000000000de6        0x2 
+                0x0000000000000de4                . = ALIGN (0x4)
+ *fill*         0x0000000000000de2        0x2 
 
-.rela.dyn       0x0000000000000de8        0x0
+.rela.dyn       0x0000000000000de4        0x0
  .rela.text.bootloader
-                0x0000000000000de8        0x0 ./User/ch32v00x_it.o
- .rela.init     0x0000000000000de8        0x0 ./User/ch32v00x_it.o
+                0x0000000000000de4        0x0 ./User/ch32v00x_it.o
+ .rela.init     0x0000000000000de4        0x0 ./User/ch32v00x_it.o
  .rela.text.handle_reset
-                0x0000000000000de8        0x0 ./User/ch32v00x_it.o
+                0x0000000000000de4        0x0 ./User/ch32v00x_it.o
 
 .bootcfg        0x0000000000003fc0        0xc
                 0x0000000000003fc0                . = ALIGN (0x4)
                 0x0000000000003fc0                FW_LEN = .
-                0x0000000000003fc0        0x4 LONG 0xde8 _etext
-                0x0000000000003fc4        0x4 LONG 0xca2 SystemInit
-                0x0000000000003fc8        0x4 LONG 0xc46 main
+                0x0000000000003fc0        0x4 LONG 0xde4 _etext
+                0x0000000000003fc4        0x4 LONG 0xc9e SystemInit
+                0x0000000000003fc8        0x4 LONG 0xc42 main
 
-.fini           0x0000000000000de8        0x0
-                0x0000000000000de8                PROVIDE (_etext = .)
+.fini           0x0000000000000de4        0x0
+                0x0000000000000de4                PROVIDE (_etext = .)
  *(SORT_NONE(.fini))
-                0x0000000000000de8                . = ALIGN (0x4)
+                0x0000000000000de4                . = ALIGN (0x4)
                 [!provide]                        PROVIDE (_eitcm = .)
 
-.preinit_array  0x0000000000000de8        0x0
+.preinit_array  0x0000000000000de4        0x0
                 [!provide]                        PROVIDE (__preinit_array_start = .)
  *(.preinit_array)
                 [!provide]                        PROVIDE (__preinit_array_end = .)
 
-.init_array     0x0000000000000de8        0x0
+.init_array     0x0000000000000de4        0x0
                 [!provide]                        PROVIDE (__init_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.init_array.*) SORT_BY_INIT_PRIORITY(.ctors.*))
  *(.init_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .ctors)
                 [!provide]                        PROVIDE (__init_array_end = .)
 
-.fini_array     0x0000000000000de8        0x0
+.fini_array     0x0000000000000de4        0x0
                 [!provide]                        PROVIDE (__fini_array_start = .)
  *(SORT_BY_INIT_PRIORITY(.fini_array.*) SORT_BY_INIT_PRIORITY(.dtors.*))
  *(.fini_array EXCLUDE_FILE(*crtend?.o *crtend.o *crtbegin?.o *crtbegin.o) .dtors)
@@ -1213,15 +1213,15 @@ END GROUP
  *(SORT_BY_NAME(.dtors.*))
  *(.dtors)
 
-.dalign         0x0000000020000000        0x0 load address 0x0000000000000de8
+.dalign         0x0000000020000000        0x0 load address 0x0000000000000de4
                 0x0000000020000000                . = ALIGN (0x4)
                 0x0000000020000000                PROVIDE (_data_vma = .)
 
-.dlalign        0x0000000000000de8        0x0
-                0x0000000000000de8                . = ALIGN (0x4)
-                0x0000000000000de8                PROVIDE (_data_lma = .)
+.dlalign        0x0000000000000de4        0x0
+                0x0000000000000de4                . = ALIGN (0x4)
+                0x0000000000000de4                PROVIDE (_data_lma = .)
 
-.data           0x0000000020000000       0x40 load address 0x0000000000000de8
+.data           0x0000000020000000       0x40 load address 0x0000000000000de4
                 0x0000000020000000                . = ALIGN (0x4)
  *(.gnu.linkonce.r.*)
  *(.data .data.*)
@@ -1242,7 +1242,7 @@ END GROUP
                 0x0000000020000040                . = ALIGN (0x4)
                 0x0000000020000040                PROVIDE (_edata = .)
 
-.bss            0x0000000020000040        0x0 load address 0x0000000000000e28
+.bss            0x0000000020000040        0x0 load address 0x0000000000000e24
                 0x0000000020000040                . = ALIGN (0x4)
                 0x0000000020000040                PROVIDE (_sbss = .)
  *(.sbss*)
@@ -1306,14 +1306,14 @@ OUTPUT(CH32V003F4P6_Bootloader.elf elf32-littleriscv)
  .debug_ranges  0x00000000000000f0      0x100 ./Peripheral/src/ch32v00x_flash.o
  .debug_ranges  0x00000000000001f0       0xd0 ./Peripheral/src/ch32v00x_rcc.o
 
-.debug_line     0x0000000000000000     0x447a
+.debug_line     0x0000000000000000     0x44c2
  .debug_line    0x0000000000000000      0x346 ./User/ch32v00x_it.o
  .debug_line    0x0000000000000346      0x30e ./User/main.o
  .debug_line    0x0000000000000654      0x785 ./User/system_ch32v00x.o
- .debug_line    0x0000000000000dd9      0x9a4 ./Startup/custom_boot.o
- .debug_line    0x000000000000177d      0x16c ./Startup/startup_ch32v00x.o
- .debug_line    0x00000000000018e9     0x1cde ./Peripheral/src/ch32v00x_flash.o
- .debug_line    0x00000000000035c7      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
+ .debug_line    0x0000000000000dd9      0x9f2 ./Startup/custom_boot.o
+ .debug_line    0x00000000000017cb      0x166 ./Startup/startup_ch32v00x.o
+ .debug_line    0x0000000000001931     0x1cde ./Peripheral/src/ch32v00x_flash.o
+ .debug_line    0x000000000000360f      0xeb3 ./Peripheral/src/ch32v00x_rcc.o
 
 .debug_str      0x0000000000000000      0xfa8
  .debug_str     0x0000000000000000      0x637 ./User/ch32v00x_it.o

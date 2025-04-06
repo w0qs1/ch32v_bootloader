@@ -36,6 +36,10 @@ post_start:
     la a0, msg2     // Firmware Check Enabled
     jal ra, print_uart
 
+    li t0, 0x08003FC0
+    lw t0, 0(t0)
+    beq t0, zero, no_fw
+
     la a0, FW_BASE
     la a1, FW_LEN
     lw a1, 0(a1)
@@ -64,6 +68,11 @@ fw_wrong:
 
 inf_loop:
     jal x0, inf_loop
+
+no_fw:
+    la a0, msg6
+    jal ra, print_uart
+    jal ra, inf_loop
 .endif
 
 // Redundant check to ensure that the beq instruction itself is not corrupted
@@ -349,6 +358,8 @@ msg3: .asciz "No Firmware Check enabled..\n"
 msg4: .asciz "Firmware corrupted!\n"
 .align 4
 msg5: .asciz "Firmware OK..\n"
+.align 4
+msg6: .asciz "No Firmware found..\n"
 .endif
 
 // .section .rodata.bootcfg, "a", @progbits

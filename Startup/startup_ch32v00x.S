@@ -89,7 +89,6 @@ _start:
 NMI_Handler:
 HardFault_Handler:
 SysTick_Handler:
-    li t0, 0x123
 SW_Handler:
 WWDG_IRQHandler:
 PVD_IRQHandler:

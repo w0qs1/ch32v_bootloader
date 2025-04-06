@@ -39,7 +39,7 @@
 //     GPIO_Init(GPIOD, &GPIOInitStructure);
 //     Delay_Init();
 
-//     while(1)
+//     while(1) 
 //     {
 //         GPIO_WriteBit(GPIOD, GPIO_Pin_0, Bit_SET);
 //         Delay_Ms(500);
@@ -72,7 +72,7 @@ int main(void) {
     *gpiod_cfglr &= ~((1 << 10) | (1 << 11)); // Output mode with Push pull configuration
 
     volatile uint32_t *gpiod_bsrr = (uint32_t *) GPIOD_BSRR;
-    
+
     while(1) {
         *gpiod_bsrr |= (1 << 18);
         delay_ms(500);

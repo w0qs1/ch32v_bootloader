@@ -12,6 +12,7 @@
 .equ    CMD_SET_SINI,       0x08
 .equ    CMD_SET_MAIN,       0x09
 .equ    CMD_FLASH_CRC,      0x0A
+.equ    CMD_REMOVE_APP,     0x0B
 .equ    EXIT,               0xFF
 
 // Functions from ch32v00x_flash.c
@@ -80,6 +81,9 @@ loop:
     
     li t1, CMD_FLASH_CRC
     beq a0, t1, cmd_flash_crc
+
+    li t1, CMD_REMOVE_APP
+    beq a0, t1, cmd_remove_app
 
     // return if an incorrect command is supplied
     beq a0, zero, return_to_caller
@@ -356,11 +360,12 @@ cmd_set_main:
     // memory into sram
     jal ra, read_flash
 
+write_main_int:
     // Erase the page
     li a0, 0x08003FC0
     jal ra, FLASH_ErasePage_Fast
     
-    // store the location of SystemInit in memory
+    // store the location of main in memory
     la a1, page_in_mem
     sw s1, 8(a1)
 
@@ -404,6 +409,15 @@ cmd_flash_crc:
     la a0, ACK
     jal ra, uart_putc
 
+    beq x0, x0, loop
+
+cmd_remove_app:
+    // write 0x00000000 to end of text in boot_cnfg to disable running the firmware
+    li s1, 0x00000000
+    jal write_main_int
+    
+    li a0, ACK
+    jal ra, uart_putc
     beq x0, x0, loop
 
 // This is if the page range is outside the limits
