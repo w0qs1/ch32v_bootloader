@@ -1,12 +1,14 @@
 import serial
 import time
 import argparse
+import struct
+import binascii
 
 class MCUFlasher:
     def __init__(self, port, baudrate=115200, timeout=1):
         """Initialize the serial connection to the MCU."""
         self.ser = serial.Serial(port, baudrate=baudrate, timeout=timeout)
-        time.sleep(2)  # Give some time for the connection to establish
+        time.sleep(0.1)  # Give some time for the connection to establish
         
     def close(self):
         """Close the serial connection."""
@@ -16,6 +18,8 @@ class MCUFlasher:
     def _send_byte(self, byte):
         """Send a single byte to the MCU."""
         self.ser.write(bytes([byte]))
+        time.sleep(0.001)
+
                 
     def _read_byte(self):
         """Read a single byte from the MCU."""
@@ -61,7 +65,7 @@ class MCUFlasher:
     def flash_read_page(self, page_addr):
         """
         Read a page (64B) from the flash.
-        Sequence: 0x05H, 0x01M, 0xPQH, 0xaaM, 0xbbM, ....
+        Sequence: 0x05H, 0xPQH, 0x01M, 0xaaM, 0xbbM, ....
         
         Args:
             page_addr: Page address in hex (range from 0x30 to 0xFF)
@@ -73,17 +77,26 @@ class MCUFlasher:
             raise ValueError("Page address must be between 0x30 and 0xFF")
             
         self._send_byte(0x05)  # CMD_FLASH_PR
-        
+            
+        # Send page address
+        self._send_byte(page_addr)
+
         # Check for ACK
         response = self._read_byte()
         if response != 0x01:
             raise RuntimeError(f"MCU did not acknowledge the command. Got: 0x{response:02X}")
-            
-        # Send page address
-        self._send_byte(page_addr)
         
         # Read page data (64 bytes)
         page_data = self._read_bytes(64)
+
+        crc_bytes = self._read_bytes(4)
+        received_crc = struct.unpack('<I', crc_bytes)[0]  # Little-endian
+
+        # Calculate CRC32 using Ethernet polynomial
+        calculated_crc = binascii.crc32(page_data) & 0xFFFFFFFF
+
+        if received_crc != calculated_crc:
+            raise RuntimeError(f"CRC mismatch! Received: 0x{received_crc:08X}, Calculated: 0x{calculated_crc:08X}")
         
         return page_data
     
@@ -100,46 +113,113 @@ class MCUFlasher:
             
         self._send_byte(0x06)  # CMD_FLASH_PE
         
+        # Send page address
+        self._send_byte(page_addr)
+
         # Check for ACK
         response = self._read_byte()
         if response != 0x01:
             return False
         
-        # Send page address
-        self._send_byte(page_addr)
-        
         return True
-    
-    def flash_write_word(self, address, data):
+
+    def flash_write_page(self, page_addr, file_path):
         """
-        Write a word to flash.
-        Sequence: 0x07H, 0xPQH, 0xRSH, 0xTUH, 0xVWH, 0xOPH, 0xMNH, 0xKLH, 0xIJH, 0x01M
+        Write a page (64B) into the flash with CRC32 appended.
+        Sequence: 0x07H, 0xYYH, <64 bytes>, <4-byte CRC>, 0x01M
+
+        Args:
+            page_addr: Page address in hex (range from 0x30 to 0xFF)
+            file_path: Path to binary file (must contain exactly 64 bytes)
+        """
+        if not (0x30 <= page_addr <= 0xFF):
+            raise ValueError("Page address must be between 0x30 and 0xFF")
+
+        # Read data from file
+        with open(file_path, 'rb') as f:
+            data = f.read(64)
+            if len(data) != 64:
+                raise ValueError(f"File must contain exactly 64 bytes, found {len(data)} bytes")
+
+        # Compute CRC32 (Ethernet polynomial, default init/final XORs)
+        crc = binascii.crc32(data) & 0xFFFFFFFF
+        crc_bytes = struct.pack('<I', crc)  # Little-endian
+
+        full_payload = data + crc_bytes  # 64B data + 4B CRC
+
+        # Unlock and erase the page
+        if not self.flash_unlock():
+            raise RuntimeError("Failed to unlock flash before write")
+        if not self.flash_erase_page(page_addr):
+            raise RuntimeError("Failed to erase flash page before write")
+
+        # Send write command
+        self._send_byte(0x07)           # CMD_FLASH_PW
+        self._send_byte(page_addr)      # Page address
+
+        # Send data + CRC
+        for byte in full_payload:
+            self._send_byte(byte)
+
+        # Wait for ACK
+        response = self._read_byte()
+        if response != 0x01:
+            raise RuntimeError(f"MCU did not acknowledge page write. Got: 0x{response:02X}")
+
+        return True
+
+    def flash_write_file(self, file_path):
+        """
+        Write an entire binary file to flash memory starting from page 0x30.
+        The file is written in 64-byte pages, one page at a time.
         
         Args:
-            address: 32-bit address (0xPQRSTUVW)
-            data: 32-bit data (0xIJKLMNOP)
+            file_path: Path to binary file
         """
-        self._send_byte(0x07)  # CMD_FLASH_PW
-        
-        # Send address (32 bits, big-endian)
-        addr_bytes = address.to_bytes(4, byteorder='big')
-        for b in addr_bytes:
-            self._send_byte(b)
-            
-        # Send data (32 bits, little-endian according to the sequence)
-        data_bytes = data.to_bytes(4, byteorder='little')
-        for b in data_bytes:
-            self._send_byte(b)
-            
+        with open(file_path, 'rb') as f:
+            page_addr = 0x30
+            while True:
+                chunk = f.read(64)
+                if not chunk:
+                    break  # End of file
+
+                if len(chunk) < 64:
+                    # Pad the last chunk with 0xFF (erased flash value)
+                    chunk += b'\xFF' * (64 - len(chunk))
+
+                # Write the 64-byte chunk to a temporary file
+                temp_path = 'temp_page.bin'
+                with open(temp_path, 'wb') as temp_f:
+                    temp_f.write(chunk)
+
+                print(f"Writing page 0x{page_addr:02X}...")
+                self.flash_write_page(page_addr, temp_path)
+
+                page_addr += 1
+                if page_addr > 0xFF:
+                    raise RuntimeError("File too large to fit in available flash pages (0x30 to 0xFF)")
+
+    def recompute_crc(self):
+        """
+        Request MCU to recompute the firmware CRC and store it in flash.
+
+        Sequence: 0x0BH
+        MCU will respond with 0x01 if successful.
+        """
+        self._send_byte(0x0A)  # CMD_RECOMPUTE_CRC
+
         response = self._read_byte()
-        return response == 0x01  # Check if ACK
-    
+        if response != 0x01:
+            raise RuntimeError(f"MCU did not acknowledge CRC recomputation. Got: 0x{response:02X}")
+
+        return True
+
     def exit_fw_upgrade(self):
         """
         Exit the Firmware upgrade mode.
-        Sequence: 0xFFH
+        Sequence: 0x00H
         """
-        self._send_byte(0xFF)  # EXIT command
+        self._send_byte(0x00)  # EXIT command
         # No response expected for this command according to the protocol
         return True
 
@@ -158,19 +238,26 @@ def main():
     
     # Lock command
     subparsers.add_parser('lock', help='Lock the flash memory from flashing/erasing')
-    
+
     # Read page command
     read_parser = subparsers.add_parser('read', help='Read a page from flash')
     read_parser.add_argument('page', type=lambda x: int(x, 16), help='Page address (0x30-0xFF)')
-    
+
     # Erase page command
     erase_parser = subparsers.add_parser('erase', help='Erase a page from flash')
     erase_parser.add_argument('page', type=lambda x: int(x, 16), help='Page address (0x30-0xFF)')
-    
-    # Write word command
-    write_parser = subparsers.add_parser('write', help='Write a word to flash')
-    write_parser.add_argument('address', type=lambda x: int(x, 16), help='32-bit address')
-    write_parser.add_argument('data', type=lambda x: int(x, 16), help='32-bit data')
+
+    # Write page command
+    write_parser = subparsers.add_parser('write', help='Write a 64-byte page to flash')
+    write_parser.add_argument('page', type=lambda x: int(x, 16), help='Page address (0x30-0xFF)')
+    write_parser.add_argument('file', type=str, help='Path to 64-byte binary file')
+
+    # Write full file command
+    full_write_parser = subparsers.add_parser('program', help='Write full binary file to flash starting from 0x30')
+    full_write_parser.add_argument('file', type=str, help='Path to binary file')
+
+    # Recompute CRC command
+    subparsers.add_parser('crc', help='Recompute the flash contents')
     
     # Exit command
     subparsers.add_parser('exit', help='Exit the Firmware upgrade mode')
@@ -214,12 +301,20 @@ def main():
                 print(f"Page 0x{args.page:02X} erased successfully.")
             else:
                 print(f"Failed to erase page 0x{args.page:02X}.")
-                    
+
         elif args.command == 'write':
-            if mcu.flash_write_word(args.address, args.data):
-                print(f"Word written successfully to address 0x{args.address:08X}.")
+            if mcu.flash_write_page(args.page, args.file):
+                print(f"Page 0x{args.page:02X} written successfully.")
             else:
-                print(f"Failed to write word to address 0x{args.address:08X}.")
+                print(f"Error during flash write")
+
+        elif args.command == 'program':
+            mcu.flash_write_file(args.file)
+            print("Full file written successfully.")
+
+        elif args.command == 'crc':
+            mcu.recompute_crc()
+            print("New CRC Computed")
                     
         elif args.command == 'exit':
             mcu.exit_fw_upgrade()
