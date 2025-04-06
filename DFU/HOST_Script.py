@@ -176,6 +176,7 @@ class MCUFlasher:
         Args:
             file_path: Path to binary file
         """
+        self.flash_unlock()
         with open(file_path, 'rb') as f:
             page_addr = 0x30
             while True:
@@ -196,14 +197,18 @@ class MCUFlasher:
                 self.flash_write_page(page_addr, temp_path)
 
                 page_addr += 1
-                if page_addr > 0xFF:
-                    raise RuntimeError("File too large to fit in available flash pages (0x30 to 0xFF)")
+                if page_addr == 0xFF:
+                    break
+                # if page_addr > 0xFF:
+                #     raise RuntimeError("File too large to fit in available flash pages (0x30 to 0xFF)")
+
+        self.recompute_crc()
 
     def recompute_crc(self):
         """
         Request MCU to recompute the firmware CRC and store it in flash.
 
-        Sequence: 0x0BH
+        Sequence: 0x0BH, 0x01M
         MCU will respond with 0x01 if successful.
         """
         self._send_byte(0x0A)  # CMD_RECOMPUTE_CRC
@@ -213,6 +218,14 @@ class MCUFlasher:
             raise RuntimeError(f"MCU did not acknowledge CRC recomputation. Got: 0x{response:02X}")
 
         return True
+
+    def remove_application(self):
+        """
+        Disable the bootloader from running the application by erasing the last page
+        """
+        self.flash_erase_page(0xFF)
+        response = self._read_byte()
+        return response == 0x01  # Check if ACK
 
     def exit_fw_upgrade(self):
         """
@@ -258,6 +271,9 @@ def main():
 
     # Recompute CRC command
     subparsers.add_parser('crc', help='Recompute the flash contents')
+
+    # Remove application command
+    subparsers.add_parser('remove', help='Disable application from running')
     
     # Exit command
     subparsers.add_parser('exit', help='Exit the Firmware upgrade mode')
@@ -315,6 +331,10 @@ def main():
         elif args.command == 'crc':
             mcu.recompute_crc()
             print("New CRC Computed")
+
+        elif args.command == 'remove':
+            mcu.remove_application()
+            print("Disabled Application")
                     
         elif args.command == 'exit':
             mcu.exit_fw_upgrade()
