@@ -197,7 +197,7 @@ class MCUFlasher:
                 self.flash_write_page(page_addr, temp_path)
 
                 page_addr += 1
-                if page_addr == 0xFF:
+                if page_addr > 0xFF:
                     break
                 # if page_addr > 0xFF:
                 #     raise RuntimeError("File too large to fit in available flash pages (0x30 to 0xFF)")
@@ -219,13 +219,22 @@ class MCUFlasher:
 
         return True
 
-    def remove_application(self):
+    def disable_application(self):
         """
         Disable the bootloader from running the application by erasing the last page
         """
         self.flash_erase_page(0xFF)
         response = self._read_byte()
         return response == 0x01  # Check if ACK
+
+    def erase_application(self):
+        """
+        Erase the entire application partition (erases pages 0x30 to 0xFF)
+        """
+        self.flash_unlock()
+        for i in range(0x30, 0x100):
+            print(f"Erasing page 0x{i:02X}...")
+            self.flash_erase_page(i)
 
     def exit_fw_upgrade(self):
         """
@@ -272,8 +281,11 @@ def main():
     # Recompute CRC command
     subparsers.add_parser('crc', help='Recompute the flash contents')
 
-    # Remove application command
-    subparsers.add_parser('remove', help='Disable application from running')
+    # Disable application command
+    subparsers.add_parser('disable', help='Disable application from running')
+
+    # Erase application command
+    subparsers.add_parser('clean', help='Erase the application partition')
     
     # Exit command
     subparsers.add_parser('exit', help='Exit the Firmware upgrade mode')
@@ -332,11 +344,16 @@ def main():
             mcu.recompute_crc()
             print("New CRC Computed")
 
-        elif args.command == 'remove':
-            mcu.remove_application()
+        elif args.command == 'disable':
+            mcu.disable_application()
             print("Disabled Application")
+
+        elif args.command == 'clean':
+            mcu.erase_application()
+            print("Erased Application Partition")
                     
         elif args.command == 'exit':
+            mcu.flash_lock()
             mcu.exit_fw_upgrade()
             print("Exited firmware upgrade mode.")
             
