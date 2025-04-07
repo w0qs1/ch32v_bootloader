@@ -235,6 +235,19 @@ class MCUFlasher:
             print(f"Erasing page 0x{i:02X}...")
             self.flash_erase_page(i)
 
+    def unlock_bootloader(self, pin):
+        self._send_byte((pin & 0xFF000000) >> 24)
+        self._send_byte((pin & 0x00FF0000) >> 16)
+        self._send_byte((pin & 0x0000FF00) >> 8)
+        self._send_byte(pin & 0x000000FF)
+
+        # Check for ACK
+        response = self._read_byte()
+        if response != 0x01:
+            return False
+        
+        return True
+
     def exit_fw_upgrade(self):
         """
         Exit the Firmware upgrade mode.
@@ -251,6 +264,10 @@ def main():
     
     subparsers = parser.add_subparsers(dest='command', help='Command to execute')
     
+    # Unlock bootloader
+    unlock_parser = subparsers.add_parser('pin', help='Pin for unlocking bootloader')
+    unlock_parser.add_argument('pin', type=lambda x: int(x, 16), help='32 bit pin in hex')
+
     # Ping command
     subparsers.add_parser('ping', help='Check if MCU is in FW Upgrade mode')
     
@@ -298,7 +315,13 @@ def main():
     try:
         mcu = MCUFlasher(args.port, baudrate=args.baudrate)
         
-        if args.command == 'ping':
+        if args.command == 'pin':
+            if mcu.unlock_bootloader(args.pin):
+                print("Bootloader unlocked successfully.")
+            else:
+                print("Pin is incorrect")
+
+        elif args.command == 'ping':
             if mcu.ping():
                 print("Ping successful, MCU is in FW Upgrade mode.")
             else:
