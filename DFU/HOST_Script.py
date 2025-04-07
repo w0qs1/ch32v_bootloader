@@ -19,7 +19,6 @@ class MCUFlasher:
         """Send a single byte to the MCU."""
         self.ser.write(bytes([byte]))
         time.sleep(0.001)
-
                 
     def _read_byte(self):
         """Read a single byte from the MCU."""
