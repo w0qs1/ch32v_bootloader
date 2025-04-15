@@ -12,7 +12,7 @@
 .equ    CMD_SET_SINI,       0x08
 .equ    CMD_SET_MAIN,       0x09
 .equ    CMD_FLASH_CRC,      0x0A
-.equ    CMD_REMOVE_APP,     0x0B
+.equ    ENTER_PIN,          0xFE
 .equ    EXIT,               0xFF
 
 // Functions from ch32v00x_flash.c
@@ -29,7 +29,7 @@ fw_upgrade:
     jal ra, gpio_init
     jal ra, gpio_check
 
-    beq a0, zero, button_pressed
+    beq a0, zero, loop0
 
     // If button is not pressed, return without any msg
     // also restores ra from stack
@@ -43,6 +43,50 @@ return_to_caller:
     la a0, fw_msg_2
     jal ra, print_uart
     beq zero, zero, return_to_caller_no_msg
+
+// Additional Starts here
+loop0:
+    li a0, ENTER_PIN
+    jal ra, uart_putc
+
+    la a0, fw_msg_3
+    jal ra, print_uart
+
+    li s1, 0x00000000
+
+    // Get 4B pin in little endian format
+    jal ra, uart_getc
+    mv s1, a0
+
+    jal ra, uart_getc
+    slli s1, s1, 8
+    or s1, s1, a0
+
+    jal ra, uart_getc
+    slli s1, s1, 8
+    or s1, s1, a0
+
+    jal ra, uart_getc
+    slli s1, s1, 8
+    or s1, s1, a0
+
+    // Get 64 bits of CHIP_UID
+    li t0, 0x1FFFF7E8
+    lw t1, 0(t0)
+    lw t2, 4(t0)
+
+    // Simple XOR operation is performed here, change it to something else to increase security
+    xor t1, t1, t2
+
+    // 0x00000000 pin exits the bootloader
+    beq s1, zero, return_to_caller
+
+    // a correct pin enables the bootloader commands
+    bne s1, t1, loop0
+
+    li a0, ACK
+    jal ra, uart_putc
+// Additional Ends here
 
 // prints "Entering Firmware Upgrade Mode.."
 button_pressed:
@@ -81,9 +125,6 @@ loop:
     
     li t1, CMD_FLASH_CRC
     beq a0, t1, cmd_flash_crc
-
-    li t1, CMD_REMOVE_APP
-    beq a0, t1, cmd_remove_app
 
     // return if an incorrect command is supplied
     beq a0, zero, return_to_caller
@@ -411,15 +452,6 @@ cmd_flash_crc:
 
     beq x0, x0, loop
 
-cmd_remove_app:
-    // write 0x00000000 to end of text in boot_cnfg to disable running the firmware
-    li s1, 0x00000000
-    jal write_main_int
-    
-    li a0, ACK
-    jal ra, uart_putc
-    beq x0, x0, loop
-
 // This is if the page range is outside the limits
 fail:
     li a0, NACK
@@ -431,6 +463,8 @@ fail:
 fw_msg_1: .asciz "Entering Firmware Upgrade Mode..\n"
 .align 4
 fw_msg_2: .asciz "Exiting Firmware Upgrade Mode..\n"
+.align 4
+fw_msg_3: .asciz "Enter pin or supply 0x00000000 to exit:\n"
 
 .section .data.bootloader, "a"
 .align 4

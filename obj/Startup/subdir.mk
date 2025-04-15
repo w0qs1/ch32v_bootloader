@@ -13,21 +13,18 @@ C_DEPS += \
 S_UPPER_SRCS += \
 ../Startup/boot_config.S \
 ../Startup/custom_boot.S \
-../Startup/flash_commands.S \
 ../Startup/fw_upgrade.S \
 ../Startup/startup_ch32v00x.S 
 
 S_UPPER_DEPS += \
 ./Startup/boot_config.d \
 ./Startup/custom_boot.d \
-./Startup/flash_commands.d \
 ./Startup/fw_upgrade.d \
 ./Startup/startup_ch32v00x.d 
 
 OBJS += \
 ./Startup/boot_config.o \
 ./Startup/custom_boot.o \
-./Startup/flash_commands.o \
 ./Startup/fw_upgrade.o \
 ./Startup/fw_upgrade.o \
 ./Startup/startup_ch32v00x.o 

@@ -38,7 +38,8 @@ post_start:
 
     li t0, 0x08003FC0
     lw t0, 0(t0)
-    beq t0, zero, no_fw
+    li t1, 0xFFFFFFFF
+    beq t0, t1, no_fw
 
     la a0, FW_BASE
     la a1, FW_LEN
